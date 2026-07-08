@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createAgentSession, DefaultResourceLoader, SessionManager } from '@earendil-works/pi-coding-agent';
@@ -18,6 +18,7 @@ const thinkingLevel = normalizeThinkingLevel(process.env.PI_THINKING_LEVEL) || '
 const sessionName = safeFileName(process.env.POASTER_AGENT_SESSION_ID || 'poaster');
 const sessionFile = `${sessionDir.replace(/\/$/, '')}/${sessionName}.jsonl`;
 const runtimeDir = dirname(fileURLToPath(import.meta.url));
+const tweetGuidance = readTweetGuidance();
 const model = getModel(providerId, modelId);
 if (!model) throw new Error(`Model not found in pi-ai catalog: ${providerId}/${modelId}`);
 
@@ -58,6 +59,7 @@ try {
     'Poaster is a split-pane app: an X-style composer on the left and this agent on the right.',
     'Help the user improve posts, generate alternatives, or inspect/edit files when asked.',
     'Prefer concise, concrete output. Do not mention the runtime provider unless asked. Do not claim a post was published unless the user provides a real tweet URL.',
+    tweetGuidance ? `Tweet-writing guidance:\n${tweetGuidance}` : '',
     '',
     prompt,
   ].join('\n'));
@@ -73,6 +75,11 @@ function safeFileName(value) {
 
 function normalizeThinkingLevel(value) {
   return ['off', 'minimal', 'low', 'medium', 'high', 'xhigh'].includes(value || '') ? value : undefined;
+}
+
+function readTweetGuidance() {
+  const path = join(runtimeDir, 'tweet-guidance.md');
+  return existsSync(path) ? readFileSync(path, 'utf8').trim() : '';
 }
 
 function writeOpenAICodexAuth(agentDir) {

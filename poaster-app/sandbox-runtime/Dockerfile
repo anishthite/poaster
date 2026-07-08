@@ -5,7 +5,7 @@ LABEL org.opencontainers.image.source="https://github.com/anishthite/poaster" \
 
 WORKDIR /workspace/poaster-sandbox-runtime
 
-COPY VERSION.txt package.json pi-runner.js ./
+COPY VERSION.txt package.json pi-runner.js tweet-guidance.md ./
 
 RUN npm install --silent --ignore-scripts \
  && mkdir -p /root/.pi/agent /root/.pi/sessions

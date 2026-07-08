@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Poaster tweet guidance image</title><meta name="task" content="Bake synthesized tweet-writing guidance into the Poaster agent image"><meta name="date-started" content="2026-07-08"><meta name="date-updated" content="2026-07-08"><meta name="status" content="shipped"><meta name="blast-radius" content="low"><meta name="tags" content="poaster,agent,tweets,image"><meta name="related" content="implementation-notes/2026-07-08-poaster-agent-lifecycle.html, /Users/anishthite/workspace/pi-twitter/RULES_v3.md"></head><body>
+<h1>Poaster tweet guidance image</h1>
+<p class="meta">branch: main · worktree: <code>/Users/anishthite/workspace/poaster</code> · 2026-07-08 · status <b>shipped</b> · blast low</p>
+<h2>Summary</h2>
+<table>
+<tr><th>Goal</th><td>Bake concise tweet-writing heuristics into the Poaster runtime image.</td></tr>
+<tr><th>Source</th><td><code>/Users/anishthite/workspace/pi-twitter/RULES_v3.md</code> with <code>RULES.md</code> as prior context.</td></tr>
+<tr><th>Surface</th><td><code>poaster-app/sandbox-runtime/*</code> runtime prompt.</td></tr>
+<tr><th>Schema</th><td>None.</td></tr>
+<tr><th>Mobile</th><td>Untouched.</td></tr>
+<tr><th>Open Qs</th><td>0.</td></tr>
+</table>
+<h2>Files</h2>
+<table>
+<tr><th>Path</th><th>Kind</th><th>Delta</th></tr>
+<tr><td><code>poaster-app/sandbox-runtime/tweet-guidance.md</code></td><td>new</td><td>Add concise guidance distilled from the curated Twitter analysis.</td></tr>
+<tr><td><code>poaster-app/sandbox-runtime/pi-runner.js</code></td><td>touch</td><td>Read <code>tweet-guidance.md</code> and include it in the agent prompt.</td></tr>
+<tr><td><code>poaster-app/sandbox-runtime/Dockerfile</code></td><td>touch</td><td>Copy <code>tweet-guidance.md</code> into the runtime image.</td></tr>
+</table>
+<h2>Decisions</h2>
+<table>
+<tr><th>ID</th><th>Choice · Rationale</th></tr>
+<tr><td>D-001</td><td>Store guidance as one markdown file. It keeps Docker image content explicit and avoids burying a long prompt in code.</td></tr>
+<tr><td>D-002</td><td>Use the v3 curated cohort as primary guidance. It corrected the noisier home-feed analysis.</td></tr>
+</table>
+<h2>Tradeoffs</h2>
+<table>
+<tr><th>ID</th><th>Picked over Rejected · Reason</th></tr>
+<tr><td>T-001</td><td>Distilled bullets over full <code>RULES_v3.md</code>. The agent needs durable constraints, not a 16KB context tax per turn.</td></tr>
+</table>
+<h2>Assumptions</h2>
+<ul><li>A-001 · "the image" means <code>poaster-app/sandbox-runtime/Dockerfile</code>; if wrong, apply the same markdown to the requested image surface.</li></ul>
+<h2>Reversibility</h2>
+<p>R-001 · low. Delete <code>tweet-guidance.md</code>, remove it from <code>Dockerfile</code>, and remove the prompt injection from <code>pi-runner.js</code>.</p>
+<h2>Definition of done</h2>
+<ul><li><code>tweet-guidance.md</code> exists in the runtime build context.</li><li><code>Dockerfile</code> copies it into the image.</li><li><code>cd poaster-app && npm run check</code> passes.</li></ul>
+</body></html>
