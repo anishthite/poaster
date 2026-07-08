@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Poaster remove tweet URL input</title><meta name="task" content="Remove visible real tweet URL input from Poaster preview"><meta name="date-started" content="2026-07-08"><meta name="status" content="shipped"><meta name="blast-radius" content="low"><meta name="tags" content="poaster,react,ui,tweet-preview"><meta name="related" content="implementation-notes/2026-07-08-poaster-react-shadcn-tweet-preview.html"></head><body>
+<h1>Poaster remove tweet URL input</h1>
+<p class="meta">branch: main · worktree: /Users/anishthite/workspace/poaster · date: 2026-07-08 · status: shipped · blast: low</p>
+<h2>Summary</h2>
+<table><tbody>
+<tr><th>Goal</th><td>Remove the visible <code>Paste real tweet URL</code> control and keep the local realistic draft preview.</td></tr>
+<tr><th>Source</th><td>User asked to remove the input.</td></tr>
+<tr><th>Surface</th><td><code>poaster-app/src/App.jsx</code>, <code>poaster-app/src/main.jsx</code>, <code>poaster-app/src/styles.css</code>, package dependencies.</td></tr>
+<tr><th>Schema</th><td>None.</td></tr>
+<tr><th>Open Qs</th><td>0.</td></tr>
+</tbody></table>
+<h2>Files</h2>
+<table><thead><tr><th>Path</th><th>Kind</th><th>Delta</th></tr></thead><tbody>
+<tr><td><code>poaster-app/src/App.jsx</code></td><td>touch</td><td>Remove tweet URL state, input, and real tweet branch.</td></tr>
+<tr><td><code>poaster-app/src/main.jsx</code></td><td>touch</td><td>Remove <code>react-tweet</code> theme import.</td></tr>
+<tr><td><code>poaster-app/src/styles.css</code></td><td>touch</td><td>Remove unused <code>react-tweet</code> overrides.</td></tr>
+<tr><td><code>poaster-app/src/components/ui/input.tsx</code></td><td>delete</td><td>Remove unused shadcn input primitive.</td></tr>
+<tr><td><code>poaster-app/package.json</code>, <code>poaster-app/package-lock.json</code></td><td>touch</td><td>Uninstall unused <code>react-tweet</code>.</td></tr>
+</tbody></table>
+<h2>Decisions</h2>
+<table><thead><tr><th>ID</th><th>Choice · Rationale</th></tr></thead><tbody>
+<tr><td>D-001</td><td>Remove the real tweet branch with the input. A hidden one-off path adds dead dependency weight.</td></tr>
+</tbody></table>
+<h2>Reversibility</h2>
+<p>R-001: Low blast; restore the removed input branch and reinstall <code>react-tweet</code>.</p>
+<h2>Definition of done</h2>
+<ul><li>No <code>Paste real tweet URL</code> input appears.</li><li><code>cd poaster-app && npm run check</code> passes.</li></ul>
+</body></html>

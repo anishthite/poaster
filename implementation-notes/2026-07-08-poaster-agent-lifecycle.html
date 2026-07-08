@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Poaster agent lifecycle</title><meta name="task" content="Match Board-style agent lifecycle without Cloudflare UI copy"><meta name="date-started" content="2026-07-08"><meta name="status" content="shipped"><meta name="blast-radius" content="medium"><meta name="tags" content="poaster,agent,lifecycle,ui"><meta name="related" content="implementation-notes/2026-07-08-poaster-real-timeline-polish.html, /Users/anishthite/workspace/board/src/agent-view.ts"></head><body>
+<h1>Poaster agent lifecycle</h1>
+<p class="meta">branch: main · worktree: /Users/anishthite/workspace/poaster · date: 2026-07-08 · status: shipped · blast: medium</p>
+<h2>Summary</h2>
+<table><tbody>
+<tr><th>Goal</th><td>Hide Sandbox branding and lifecycle controls while keeping auto-start, idle stop, and reload resume.</td></tr>
+<tr><th>Source</th><td>User asked for no Cloudflare Sandbox UI copy, then no visible pause/resume/delete controls.</td></tr>
+<tr><th>Surface</th><td><code>poaster-app/src/*</code>, <code>poaster-app/server/routes/agent.ts</code>, <code>poaster-app/server/lib/*</code>, <code>poaster-app/sandbox-runtime/pi-runner.js</code>.</td></tr>
+<tr><th>Check</th><td><code>cd poaster-app && npm run check</code> plus browser smoke.</td></tr>
+</tbody></table>
+<h2>UI layout</h2>
+<ol>
+<li>Agent header shows <code>Assistant</code> and a single status pill.</li>
+<li>Lifecycle controls stay hidden; sending auto-starts and the status pill reports readiness.</li>
+<li>Transcript persists in local storage and restores on reload.</li>
+</ol>
+<h2>Files</h2>
+<table><thead><tr><th>Path</th><th>Kind</th><th>Delta</th></tr></thead><tbody>
+<tr><td><code>poaster-app/src/main.js</code></td><td>touch</td><td>Replace manual sandbox controls with hidden lifecycle hooks and local transcript resume.</td></tr>
+<tr><td><code>poaster-app/src/agent-api.js</code></td><td>touch</td><td>Add delete endpoint and pass history through streamed turns.</td></tr>
+<tr><td><code>poaster-app/src/styles.css</code></td><td>touch</td><td>Remove Sandbox chrome and style compact lifecycle controls.</td></tr>
+<tr><td><code>poaster-app/server/routes/agent.ts</code></td><td>touch</td><td>Add delete route and neutral runtime statuses.</td></tr>
+<tr><td><code>poaster-app/server/lib/cloudflare-sandbox.ts</code></td><td>touch</td><td>Return richer session timestamps/title without adding storage.</td></tr>
+<tr><td><code>poaster-app/server/lib/pi-runtime.ts</code></td><td>touch</td><td>Include chat history in prompt context.</td></tr>
+<tr><td><code>poaster-app/sandbox-runtime/pi-runner.js</code></td><td>touch</td><td>Remove Cloudflare wording from the model system prompt.</td></tr>
+</tbody></table>
+<h2>Decisions</h2>
+<table><thead><tr><th>ID</th><th>Choice</th><th>Rationale</th></tr></thead><tbody>
+<tr><td>D-001</td><td>Use browser storage for Poaster chat history.</td><td>Poaster has no D1 binding; local resume satisfies reload/session continuity without a migration.</td></tr>
+<tr><td>D-002</td><td>Map <code>pause</code> to the existing stop endpoint.</td><td>Board stops the remote runtime while preserving the conversation for resume.</td></tr>
+<tr><td>D-003</td><td>Keep explicit lifecycle buttons but remove vendor/runtime names.</td><td>The user wanted no Cloudflare UI copy, not hidden lifecycle controls.</td></tr>
+<tr><td>D-004</td><td>Supersedes: D-003; hide lifecycle controls.</td><td>The user clarified pause/resume/delete should not be visible.</td></tr>
+</tbody></table>
+<h2>Tradeoffs</h2>
+<table><thead><tr><th>ID</th><th>Picked over Rejected</th><th>Reason</th></tr></thead><tbody>
+<tr><td>T-001</td><td>Local persistence over D1 tables.</td><td>The current app has no DB; D1 would add deployment setup for one-user chat history.</td></tr>
+</tbody></table>
+<h2>Reversibility</h2>
+<p>R-001: Medium blast across client, API, and runtime prompt; revert the touched files and remove this note.</p>
+<h2>Definition of done</h2>
+<ul><li>No visible <code>Cloudflare Sandbox</code> UI copy.</li><li>No visible pause/resume/delete controls.</li><li>Sending a message auto-starts the runtime.</li><li>Idle stop and reload resume paths exist.</li><li><code>cd poaster-app && npm run check</code> passes.</li></ul>
+</body></html>

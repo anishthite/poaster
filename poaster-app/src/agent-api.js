@@ -23,11 +23,19 @@ export async function stopAgentSession(id) {
   return body.session;
 }
 
-export async function streamPiTurn(id, input, onEvent) {
+export async function deleteAgentSession(id) {
+  const res = await fetch(`/api/agent/sessions/${encodeURIComponent(id)}`, { method: 'DELETE' });
+  const body = await readJson(res);
+  if (!res.ok) throw new Error(body.error || `session delete failed: ${res.status}`);
+  return body.session;
+}
+
+export async function streamPiTurn(id, input, onEvent, opts = {}) {
   const res = await fetch(`/api/agent/sessions/${encodeURIComponent(id)}/pi/stream`, {
     method: 'POST',
     headers: { 'content-type': 'application/json', accept: 'text/event-stream' },
     body: JSON.stringify(input),
+    signal: opts.signal,
   });
   if (!res.ok || !res.body) {
     const body = await readJson(res).catch(() => ({}));

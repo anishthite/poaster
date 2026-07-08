@@ -7,9 +7,13 @@ export type AgentSession = {
   id: string;
   provider: 'cloudflare-sandbox';
   providerSessionId: string | null;
+  title: string | null;
   status: 'ready' | 'stopped' | 'error';
   cwd: string | null;
   errorMessage: string | null;
+  createdAt: number;
+  updatedAt: number;
+  deletedAt: number | null;
 };
 
 export type CloudflareSandboxStreamEvent =
@@ -23,8 +27,9 @@ export class CloudflareSandboxCommandError extends Error {
   }
 }
 
-export function sandboxSession(id: string, status: AgentSession['status'] = 'ready', errorMessage: string | null = null): AgentSession {
-  return { id, provider: 'cloudflare-sandbox', providerSessionId: `poaster-${id}`, status, cwd: SANDBOX_CWD, errorMessage };
+export function sandboxSession(id: string, status: AgentSession['status'] = 'ready', errorMessage: string | null = null, title: string | null = null): AgentSession {
+  const now = Date.now();
+  return { id, provider: 'cloudflare-sandbox', providerSessionId: `poaster-${id}`, title, status, cwd: SANDBOX_CWD, errorMessage, createdAt: now, updatedAt: now, deletedAt: null };
 }
 
 export class CloudflareSandboxClient {
@@ -34,8 +39,8 @@ export class CloudflareSandboxClient {
     return env.Sandbox ? new CloudflareSandboxClient(env.Sandbox) : null;
   }
 
-  async createSession(id: string): Promise<AgentSession> {
-    const session = sandboxSession(id);
+  async createSession(id: string, title: string | null = null): Promise<AgentSession> {
+    const session = sandboxSession(id, 'ready', null, title);
     await (await this.sandbox(session.providerSessionId!)).exec('mkdir -p /workspace', { cwd: SANDBOX_CWD, timeout: 60_000 });
     return session;
   }
@@ -63,7 +68,7 @@ export class CloudflareSandboxClient {
     await Promise.all(pending);
     await onEvent({ stream: 'exit', code: result.exitCode });
     const debug = { request, response: result };
-    if (!result.success) throw new CloudflareSandboxCommandError(`Cloudflare Sandbox command failed: ${result.exitCode} ${result.stderr.slice(0, 240)}`, debug);
+    if (!result.success) throw new CloudflareSandboxCommandError(`agent command failed: ${result.exitCode} ${result.stderr.slice(0, 240)}`, debug);
     return { stdout: stdout || `${result.stdout}${stderr}`, parsed: result as ExecResult, debug };
   }
 

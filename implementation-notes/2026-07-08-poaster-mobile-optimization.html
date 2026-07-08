@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Poaster mobile optimization</title><meta name="task" content="Optimize Poaster for mobile phone layouts"><meta name="date-started" content="2026-07-08"><meta name="status" content="shipped"><meta name="blast-radius" content="low"><meta name="tags" content="poaster,react,ui,mobile"><meta name="related" content="implementation-notes/2026-07-08-poaster-react-shadcn-tweet-preview.html"></head><body>
+<h1>Poaster mobile optimization</h1>
+<p class="meta">branch: main · worktree: /Users/anishthite/workspace/poaster · date: 2026-07-08 · status: shipped · blast: low</p>
+<h2>Summary</h2>
+<table><tbody>
+<tr><th>Goal</th><td>Make the composer, preview, and assistant usable on phone widths without horizontal overflow.</td></tr>
+<tr><th>Source</th><td>User asked for mobile support and a push when done.</td></tr>
+<tr><th>Surface</th><td><code>poaster-app/src/App.jsx</code>, <code>poaster-app/src/styles.css</code>, <code>poaster-app/index.html</code>.</td></tr>
+<tr><th>Schema</th><td>None.</td></tr>
+<tr><th>Mobile</th><td>Use dynamic viewport height, compact spacing below <code>640px</code>, and wrap action rows.</td></tr>
+<tr><th>Open Qs</th><td>0.</td></tr>
+</tbody></table>
+<h2>UI layout</h2>
+<ol>
+<li><b>Shell</b>: Keep two columns on desktop and one column on mobile with no fixed minimum wider than the viewport.</li>
+<li><b>Composer</b>: Shrink avatar/text chrome, wrap tools/actions, and keep buttons touch-sized.</li>
+<li><b>Assistant</b>: Cap transcript height with <code>100dvh</code> math so the form remains reachable.</li>
+</ol>
+<h2>Files</h2>
+<table><thead><tr><th>Path</th><th>Kind</th><th>Delta</th></tr></thead><tbody>
+<tr><td><code>poaster-app/src/App.jsx</code></td><td>touch</td><td>Add mobile Tailwind classes for shell, composer, preview, and assistant.</td></tr>
+<tr><td><code>poaster-app/src/styles.css</code></td><td>touch</td><td>Add viewport overflow guards and mobile text input sizing.</td></tr>
+<tr><td><code>poaster-app/index.html</code></td><td>touch</td><td>Keep existing responsive viewport metadata.</td></tr>
+</tbody></table>
+<h2>Decisions</h2>
+<table><thead><tr><th>ID</th><th>Choice · Rationale</th></tr></thead><tbody>
+<tr><td>D-001</td><td>Use Tailwind responsive utilities instead of a mobile router or duplicated components. One screen keeps the diff small.</td></tr>
+<tr><td>D-002</td><td>Optimize for stacked sections instead of bottom navigation. Both panels already need vertical reading.</td></tr>
+</tbody></table>
+<h2>Tradeoffs</h2>
+<table><thead><tr><th>ID</th><th>Picked over Rejected · Reason</th></tr></thead><tbody>
+<tr><td>T-001</td><td>Wrapped action rows over icon overflow scrolling. Primary actions stay visible on narrow phones.</td></tr>
+</tbody></table>
+<h2>Reversibility</h2>
+<p>R-001: Low blast; revert the responsive class changes and mobile CSS guards.</p>
+<h2>Definition of done</h2>
+<ul><li><code>cd poaster-app && npm run check</code> passes.</li><li>Mobile screenshot at <code>390x844</code> shows no horizontal overflow.</li><li>Changes are committed and pushed to <code>origin/main</code>.</li></ul>
+</body></html>

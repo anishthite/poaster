@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Poaster React shadcn tweet preview</title><meta name="task" content="Convert Poaster UI to React with shadcn b0 and realistic tweet previews"><meta name="date-started" content="2026-07-08"><meta name="status" content="shipped"><meta name="blast-radius" content="medium"><meta name="tags" content="poaster,react,shadcn,tweet-preview,ui"><meta name="related" content="implementation-notes/2026-07-08-poaster-real-timeline-polish.html, implementation-notes/2026-07-08-poaster-agent-lifecycle.html"></head><body>
+<h1>Poaster React shadcn tweet preview</h1>
+<p class="meta">branch: main · worktree: /Users/anishthite/workspace/poaster · date: 2026-07-08 · status: shipped · blast: medium</p>
+<h2>Summary</h2>
+<table><tbody>
+<tr><th>Goal</th><td>Convert the client to React, apply shadcn <code>--preset b0</code>, and make draft/real tweet previews look realistic.</td></tr>
+<tr><th>Source</th><td>User approved React, shadcn, and the <code>b0</code> preset.</td></tr>
+<tr><th>Surface</th><td><code>poaster-app/src/*</code>, Vite config, package dependencies, shadcn component files.</td></tr>
+<tr><th>Schema</th><td>None.</td></tr>
+<tr><th>Mobile</th><td>Keep one-column stack under tablet width.</td></tr>
+<tr><th>Open Qs</th><td>0.</td></tr>
+</tbody></table>
+<h2>UI layout</h2>
+<ol>
+<li><b>Composer</b>: React textarea, character count, intent link, and shadcn controls.</li>
+<li><b>Draft tweet</b>: Local card mirrors X embedded post chrome for unsent drafts.</li>
+<li><b>Real tweet</b>: <code>react-tweet</code> renders pasted public status URLs.</li>
+<li><b>Assistant</b>: Existing streaming/session behavior moves into React state and refs.</li>
+</ol>
+<h2>Files</h2>
+<table><thead><tr><th>Path</th><th>Kind</th><th>Delta</th></tr></thead><tbody>
+<tr><td><code>poaster-app/src/main.jsx</code></td><td>new</td><td>Mount React app.</td></tr>
+<tr><td><code>poaster-app/src/App.jsx</code></td><td>new</td><td>Port composer, preview, and assistant state.</td></tr>
+<tr><td><code>poaster-app/src/components/ui/*</code></td><td>new</td><td>Add shadcn UI primitives used by the screen.</td></tr>
+<tr><td><code>poaster-app/src/lib/utils.ts</code></td><td>new</td><td>Add shadcn class merge helper.</td></tr>
+<tr><td><code>poaster-app/components.json</code></td><td>new</td><td>Record shadcn <code>b0</code> preset setup.</td></tr>
+<tr><td><code>poaster-app/src/styles.css</code></td><td>touch</td><td>Replace vanilla layout CSS with Tailwind/shadcn theme glue and tweet polish.</td></tr>
+<tr><td><code>poaster-app/index.html</code></td><td>touch</td><td>Point Vite at <code>src/main.jsx</code> and suppress favicon 404.</td></tr>
+<tr><td><code>poaster-app/tsconfig.json</code>, <code>poaster-app/vite.config.js</code></td><td>touch</td><td>Add alias, React plugin, and Tailwind Vite plugin.</td></tr>
+<tr><td><code>poaster-app/package.json</code>, <code>poaster-app/package-lock.json</code></td><td>touch</td><td>Add React, shadcn, Tailwind, and tweet rendering dependencies.</td></tr>
+<tr><td><code>poaster-app/src/main.js</code></td><td>delete</td><td>Remove replaced vanilla DOM entrypoint.</td></tr>
+</tbody></table>
+<h2>Decisions</h2>
+<table><thead><tr><th>ID</th><th>Choice · Rationale</th></tr></thead><tbody>
+<tr><td>D-001</td><td>Use <code>react-tweet</code> only for real tweet IDs. Draft text has no official X-renderable object.</td></tr>
+<tr><td>D-002</td><td>Keep client code in JavaScript/JSX. Existing <code>tsconfig.json</code> only validates worker/server TypeScript.</td></tr>
+<tr><td>D-003</td><td>Install only shadcn primitives used on this screen. Extra registry components add dead code.</td></tr>
+</tbody></table>
+<h2>Tradeoffs</h2>
+<table><thead><tr><th>ID</th><th>Picked over Rejected · Reason</th></tr></thead><tbody>
+<tr><td>T-001</td><td>Custom <code>DraftTweetCard</code> over feeding fake data to <code>react-tweet</code>. The package expects fetched tweet data shape.</td></tr>
+</tbody></table>
+<h2>Reversibility</h2>
+<p>R-001: Medium blast; revert dependency/config changes and restore <code>poaster-app/src/main.js</code> plus the old stylesheet.</p>
+<h2>Definition of done</h2>
+<ul><li><code>npx shadcn@latest init --preset b0</code> has been applied.</li><li>Draft preview looks like an embedded X post without needing a real URL.</li><li>Real public tweet URL path renders through <code>react-tweet</code>.</li><li><code>cd poaster-app && npm run check</code> passes.</li><li>Browser screenshot: <code>output/playwright/react-shadcn-tweet-preview.png</code>.</li></ul>
+</body></html>

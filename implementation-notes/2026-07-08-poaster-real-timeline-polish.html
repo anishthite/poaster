@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Poaster real timeline polish</title><meta name="task" content="Make the Poaster composer look more like X"><meta name="date-started" content="2026-07-08"><meta name="status" content="shipped"><meta name="blast-radius" content="low"><meta name="tags" content="poaster,ui,timeline,composer"><meta name="related" content="implementation-notes/2026-07-08-poaster-split-pane-sandbox.html"></head><body>
+<h1>Poaster real timeline polish</h1>
+<p class="meta">branch: main · worktree: /Users/anishthite/workspace/poaster · date: 2026-07-08 · status: shipped · blast: low</p>
+<h2>Summary</h2>
+<table><tbody>
+<tr><th>Goal</th><td>Remove visible <code>X intent</code> wording and make the composer read like an X timeline.</td></tr>
+<tr><th>Source</th><td>User asked: “doesnt need to say it uses the x intent” and “make it look real”.</td></tr>
+<tr><th>Surface</th><td><code>poaster-app/src/main.js</code>, <code>poaster-app/src/styles.css</code>.</td></tr>
+<tr><th>Check</th><td><code>cd poaster-app && npm run check</code>.</td></tr>
+</tbody></table>
+<h2>UI layout</h2>
+<ol>
+<li>Left pane uses a sticky <code>Home</code> header and <code>For you</code>/<code>Following</code> tabs.</li>
+<li>Composer uses compact avatar, reply scope, toolbar, character count, preview, and <code>Post on X</code> action.</li>
+<li>Preview card adds verified mark, overflow dots, and X-like metric row.</li>
+</ol>
+<h2>Files</h2>
+<table><thead><tr><th>Path</th><th>Kind</th><th>Delta</th></tr></thead><tbody>
+<tr><td><code>poaster-app/src/main.js</code></td><td>touch</td><td>Remove intent pill copy, add timeline tabs/reply scope, and disable posting for empty drafts.</td></tr>
+<tr><td><code>poaster-app/src/styles.css</code></td><td>touch</td><td>Replace hero/card styling with timeline column, compact composer, and X-like preview details.</td></tr>
+</tbody></table>
+<h2>Decisions</h2>
+<table><thead><tr><th>ID</th><th>Choice</th><th>Rationale</th></tr></thead><tbody>
+<tr><td>D-001</td><td>Keep Web Intent behavior but remove visible explanation.</td><td>The user objected to the label, not the posting mechanism.</td></tr>
+<tr><td>D-002</td><td>Use CSS and static markup only.</td><td>No new dependency is needed for timeline chrome.</td></tr>
+</tbody></table>
+<h2>Tradeoffs</h2>
+<table><thead><tr><th>ID</th><th>Picked over Rejected</th><th>Reason</th></tr></thead><tbody>
+<tr><td>T-001</td><td>X-like local chrome over embedded live composer.</td><td>X exposes intent and embed surfaces, not a native composer embed.</td></tr>
+</tbody></table>
+<h2>Reversibility</h2>
+<p>R-001: Low blast; revert the two source file edits and remove this note.</p>
+<h2>Definition of done</h2>
+<ul><li>No visible <code>uses X intent</code> copy.</li><li>Composer visually reads as timeline content instead of a marketing panel.</li><li><code>cd poaster-app && npm run check</code> passes.</li></ul>
+</body></html>

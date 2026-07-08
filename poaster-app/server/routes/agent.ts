@@ -9,22 +9,24 @@ export async function handleAgentRequest(request: Request, env: Env): Promise<Re
   if (request.method === 'POST' && parts[0] === 'sessions' && parts.length === 1) return createSession(request, env);
   if (request.method === 'POST' && parts[0] === 'sessions' && parts[2] === 'start') return startSession(parts[1]!, env);
   if (request.method === 'POST' && parts[0] === 'sessions' && parts[2] === 'stop') return stopSession(parts[1]!, env);
+  if (request.method === 'DELETE' && parts[0] === 'sessions' && parts.length === 2) return deleteSession(parts[1]!, env);
   if (request.method === 'POST' && parts[0] === 'sessions' && parts[2] === 'pi' && parts[3] === 'stream') return streamTurn(request, env, parts[1]!);
 
   return json({ error: 'not found' }, 404);
 }
 
 async function createSession(request: Request, env: Env): Promise<Response> {
-  await request.json().catch(() => ({}));
+  const body = await request.json().catch(() => ({})) as { title?: unknown };
   const id = crypto.randomUUID().replace(/-/g, '').slice(0, 12);
+  const title = typeof body.title === 'string' ? body.title.trim().slice(0, 120) : null;
   const client = CloudflareSandboxClient.fromEnv(env);
-  if (!client) return json({ error: 'Cloudflare Sandbox binding is not configured' }, 503);
-  return json({ session: await client.createSession(id) }, 201);
+  if (!client) return json({ error: 'agent runtime is not configured' }, 503);
+  return json({ session: await client.createSession(id, title) }, 201);
 }
 
 async function startSession(id: string, env: Env): Promise<Response> {
   const client = CloudflareSandboxClient.fromEnv(env);
-  if (!client) return json({ error: 'Cloudflare Sandbox binding is not configured' }, 503);
+  if (!client) return json({ error: 'agent runtime is not configured' }, 503);
   return json({ session: await client.createSession(id) });
 }
 
@@ -34,12 +36,19 @@ async function stopSession(id: string, env: Env): Promise<Response> {
   return json({ session: sandboxSession(id, 'stopped') });
 }
 
+async function deleteSession(id: string, env: Env): Promise<Response> {
+  const client = CloudflareSandboxClient.fromEnv(env);
+  if (client) await client.deleteSession(id).catch(() => null);
+  return json({ session: { ...sandboxSession(id, 'stopped'), deletedAt: Date.now() } });
+}
+
 async function streamTurn(request: Request, env: Env, id: string): Promise<Response> {
   const body = await request.json().catch(() => ({})) as Record<string, unknown>;
   const message = typeof body.message === 'string' ? body.message.trim().slice(0, 200_000) : '';
+  const history = readHistory(body.history);
   if (!message) return json({ error: 'message required' }, 400);
   const client = CloudflareSandboxClient.fromEnv(env);
-  if (!client) return json({ error: 'Cloudflare Sandbox binding is not configured' }, 503);
+  if (!client) return json({ error: 'agent runtime is not configured' }, 503);
 
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
@@ -49,7 +58,7 @@ async function streamTurn(request: Request, env: Env, id: string): Promise<Respo
       let fallback = '';
       let lineBuffer = '';
       try {
-        emit({ type: 'status', message: 'running pi inside Cloudflare Sandbox…' });
+        emit({ type: 'status', message: 'starting…' });
         const model = resolveModel(env);
         const command = buildPiPromptCommand({
           sessionId: id,
@@ -57,6 +66,7 @@ async function streamTurn(request: Request, env: Env, id: string): Promise<Respo
           draft: typeof body.draft === 'string' ? body.draft : '',
           postedPreview: typeof body.postedPreview === 'string' ? body.postedPreview : '',
           tweetUrl: typeof body.tweetUrl === 'string' ? body.tweetUrl : '',
+          history,
           llmProvider: model.provider,
           llmModel: model.model,
           awsRegion: env.AWS_REGION,
@@ -66,7 +76,7 @@ async function streamTurn(request: Request, env: Env, id: string): Promise<Respo
           awsBearerTokenBedrock: env.AWS_BEARER_TOKEN_BEDROCK,
           openaiCodexOAuthJson: env.OPENAI_CODEX_OAUTH_JSON,
         });
-        emit({ type: 'status', message: `sandbox ready; model ${model.provider}/${model.model}` });
+        emit({ type: 'status', message: 'ready' });
         if (body.debug === true) emit({ type: 'debug', command: redactPiPromptCommand(command) });
         const result = await client.streamCommand(id, command, async (event) => {
           if (event.stream === 'stderr') {
@@ -111,6 +121,16 @@ async function streamTurn(request: Request, env: Env, id: string): Promise<Respo
       'cache-control': 'no-cache, no-transform',
       connection: 'keep-alive',
     },
+  });
+}
+
+function readHistory(value: unknown): Array<{ role: 'user' | 'assistant'; content: string }> {
+  if (!Array.isArray(value)) return [];
+  return value.slice(-20).flatMap((item) => {
+    if (!isRecord(item)) return [];
+    const role = item.role === 'user' || item.role === 'assistant' ? item.role : null;
+    const content = typeof item.content === 'string' ? item.content.trim().slice(0, 20_000) : '';
+    return role && content ? [{ role, content }] : [];
   });
 }
 

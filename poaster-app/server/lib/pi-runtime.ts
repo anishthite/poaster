@@ -17,6 +17,7 @@ export type PiPromptInput = {
   draft?: string | null;
   postedPreview?: string | null;
   tweetUrl?: string | null;
+  history?: Array<{ role: 'user' | 'assistant'; content: string }> | null;
   workdir?: string | null;
   llmProvider?: string | null;
   llmModel?: string | null;
@@ -40,10 +41,12 @@ export function buildPiPromptCommand(input: PiPromptInput): string {
   const prompt = [
     'You are helping build and improve a post in Poaster.',
     'Be concrete. If editing copy, return usable alternatives. If asked about implementation, inspect files first.',
+    'Do not mention the runtime provider unless the user asks.',
     '',
-    `Current draft:\n${input.draft || '(empty)'}`,
+    `Current composer draft (included automatically):\n${input.draft || '(empty)'}`,
     `Local tweeted preview:\n${input.postedPreview || '(none)'}`,
     `Real tweet URL:\n${input.tweetUrl || '(none)'}`,
+    `Recent conversation:\n${formatHistory(input.history)}`,
     '',
     `User request:\n${input.message}`,
   ].join('\n');
@@ -74,6 +77,14 @@ export function redactPiPromptCommand(command: string): string {
   let out = command;
   for (const key of SECRET_ENV_KEYS) out = out.replace(new RegExp(`${key}='[^']*'`, 'g'), `${key}='<redacted>'`);
   return out;
+}
+
+function formatHistory(history: PiPromptInput['history']): string {
+  if (!history?.length) return '(none)';
+  return history
+    .slice(-12)
+    .map((turn) => `${turn.role}: ${turn.content.slice(0, 4000)}`)
+    .join('\n\n');
 }
 
 function shellWord(s: string): string {
