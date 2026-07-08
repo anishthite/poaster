@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Poaster split pane sandbox</title><meta name="task" content="Build split-pane tweet composer with Cloudflare Sandbox agent"><meta name="date-started" content="2026-07-08"><meta name="status" content="shipped"><meta name="blast-radius" content="medium"><meta name="tags" content="poaster,ui,cloudflare-sandbox,agent"><meta name="related" content="artifacts/poaster-split-pane-plan.html"></head><body>
+<h1>Poaster split pane sandbox</h1>
+<p class="meta">branch unknown · worktree <code>/Users/anishthite/workspace/poaster</code> · 2026-07-08 · shipped · medium</p>
+<h2>Summary</h2>
+<table><tbody>
+<tr><th>Goal</th><td>Build <code>poaster-app/</code> with an X-style composer and a Cloudflare Sandbox-backed agent.</td></tr>
+<tr><th>Source</th><td>User asked for a subfolder app, official-looking tweet UI, tweeted preview, and Board-style Sandbox agent.</td></tr>
+<tr><th>Surface</th><td><code>src/*</code>, <code>server/*</code>, <code>worker/*</code>, <code>sandbox-runtime/*</code>, <code>wrangler.toml</code>.</td></tr>
+<tr><th>API</th><td><code>POST /api/agent/sessions</code>, <code>/start</code>, <code>/stop</code>, <code>/pi/stream</code>.</td></tr>
+<tr><th>Schema</th><td>No DB; session id maps deterministically to <code>poaster-&lt;id&gt;</code>.</td></tr>
+<tr><th>Open Qs</th><td>0; defaults applied from the plan.</td></tr>
+</tbody></table>
+<h2>API contract</h2>
+<pre>POST /api/agent/sessions {}
+→ { session: { id, provider, providerSessionId, status, cwd, errorMessage } }
+
+POST /api/agent/sessions/:id/pi/stream { message, draft, postedPreview, tweetUrl }
+→ text/event-stream events: status | stdout | stderr | done | error</pre>
+<h2>UI layout</h2>
+<ol>
+<li>Left pane renders local X-style composer, intent link, local posted card, and optional real tweet embed.</li>
+<li>Right pane renders agent transcript, sandbox controls, status line, and streaming answer.</li>
+</ol>
+<h2>Files</h2>
+<table><thead><tr><th>Path</th><th>Kind</th><th>Delta</th></tr></thead><tbody>
+<tr><td><code>poaster-app/package.json</code></td><td>new</td><td>Vite, Wrangler, Sandbox scripts and deps.</td></tr>
+<tr><td><code>poaster-app/src/*</code></td><td>new</td><td>Composer helpers, browser UI, agent API client, CSS.</td></tr>
+<tr><td><code>poaster-app/server/*</code></td><td>new</td><td>Trimmed Sandbox client and agent routes.</td></tr>
+<tr><td><code>poaster-app/worker/index.ts</code></td><td>new</td><td>Worker entry routes API before assets and exports <code>Sandbox</code>.</td></tr>
+<tr><td><code>poaster-app/sandbox-runtime/*</code></td><td>new</td><td>Container runtime for pi prompt execution.</td></tr>
+<tr><td><code>poaster-app/tests/composer.test.mjs</code></td><td>new</td><td>Small URL/parser/count self-check.</td></tr>
+</tbody></table>
+<h2>Decisions</h2>
+<table><thead><tr><th>ID</th><th>Choice</th><th>Rationale</th></tr></thead><tbody>
+<tr><td>D-001</td><td>Use <code>poaster-app/</code>.</td><td>The plan picked this default; it avoids literal duplicated repo nesting.</td></tr>
+<tr><td>D-002</td><td>Use native DOM + Vite.</td><td>React adds no value for one page.</td></tr>
+<tr><td>D-003</td><td>Keep agent sessions stateless server-side.</td><td>Deterministic sandbox ids avoid D1 for the MVP.</td></tr>
+<tr><td>D-004</td><td>Use Web Intent for posting.</td><td>X exposes official intent links, not an embeddable composer.</td></tr>
+</tbody></table>
+<h2>Tradeoffs</h2>
+<table><thead><tr><th>ID</th><th>Picked over Rejected</th><th>Reason</th></tr></thead><tbody>
+<tr><td>T-001</td><td>Local posted preview over fake official iframe.</td><td>X compose iframes are not a supported component.</td></tr>
+<tr><td>T-002</td><td>Direct Worker router over Hono.</td><td>Four endpoints do not need a framework.</td></tr>
+</tbody></table>
+<h2>Assumptions</h2>
+<ul><li>A-001: Agent persistence across reloads is not required for the first build.</li><li>A-002: The agent helps with the post/page from inside the sandbox; it does not mutate the local host repo.</li></ul>
+<h2>Reversibility</h2>
+<p>R-001: Medium blast from Worker container config and server routes; remove <code>poaster-app/</code> and <code>implementation-notes/2026-07-08-poaster-split-pane-sandbox.html</code> to revert.</p>
+<h2>Followups</h2>
+<ul><li>L-001: Add D1 thread persistence only after reload-resume matters.</li><li>L-002: Add OAuth/API posting only after intent posting is insufficient.</li></ul>
+<h2>Definition of done</h2>
+<ul><li>Composer updates count and preview.</li><li>Intent URL opens with draft text.</li><li>Agent starts a sandbox session and streams events.</li><li><code>npm run check</code> passes inside <code>poaster-app/</code>.</li><li>Repository is ready to push to <code>github.com/anishthite/poaster</code>.</li></ul>
+</body></html>

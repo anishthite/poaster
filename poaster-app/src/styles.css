@@ -1,0 +1,108 @@
+:root {
+  color-scheme: dark;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #000;
+  color: #e7e9ea;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100vh; background: #000; }
+button, textarea, input { font: inherit; }
+
+.shell {
+  display: grid;
+  grid-template-columns: minmax(360px, 1.05fr) minmax(360px, 0.95fr);
+  min-height: 100vh;
+}
+
+.pane { padding: 28px; overflow: auto; }
+.composer-pane { border-right: 1px solid #2f3336; }
+.agent-pane { background: #050505; display: grid; grid-template-rows: auto 1fr auto; gap: 18px; }
+
+.topbar, .section-heading, .composer-actions, .agent-actions, .tweet-head, .composer-tools {
+  display: flex;
+  align-items: center;
+}
+.topbar, .section-heading, .composer-actions, .agent-actions { justify-content: space-between; gap: 14px; }
+.topbar { margin-bottom: 24px; }
+
+.eyebrow { margin: 0 0 4px; color: #71767b; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: .08em; }
+h1, h2 { margin: 0; letter-spacing: -.04em; }
+h1 { font-size: clamp(30px, 4vw, 52px); }
+h2 { font-size: 24px; }
+
+.official-pill, .status-dot {
+  border: 1px solid #2f3336;
+  border-radius: 999px;
+  padding: 7px 12px;
+  color: #8ecdf8;
+  background: #071019;
+  white-space: nowrap;
+}
+
+.composer-card, .tweet-card, .transcript, .agent-form {
+  border: 1px solid #2f3336;
+  border-radius: 24px;
+  background: #000;
+}
+
+.composer-card { display: grid; grid-template-columns: 48px 1fr; gap: 14px; padding: 18px; }
+.avatar { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 999px; background: linear-gradient(135deg, #1d9bf0, #7856ff); color: white; font-weight: 900; }
+.avatar.small { width: 40px; height: 40px; font-size: 14px; }
+.composer-body { min-width: 0; }
+
+textarea, input {
+  width: 100%;
+  color: #e7e9ea;
+  background: transparent;
+  border: 0;
+  outline: 0;
+}
+#draft { min-height: 180px; resize: vertical; font-size: 24px; line-height: 1.35; }
+#agent-input { resize: vertical; line-height: 1.45; }
+#tweet-url { max-width: 380px; border: 1px solid #2f3336; border-radius: 999px; padding: 10px 14px; }
+
+.composer-tools { gap: 14px; color: #1d9bf0; border-top: 1px solid #2f3336; padding-top: 14px; }
+.composer-tools span { font-size: 14px; font-weight: 700; }
+.composer-actions { margin-top: 16px; }
+.count { color: #71767b; }
+.count.bad { color: #f4212e; font-weight: 800; }
+
+button, .post-button {
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 18px;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 800;
+}
+.post-button { color: white; background: #1d9bf0; }
+.post-button:hover { background: #1a8cd8; }
+.post-button.disabled, button:disabled { opacity: .45; pointer-events: none; }
+.ghost { color: #e7e9ea; background: transparent; border: 1px solid #2f3336; }
+.ghost:hover { background: #0f1419; }
+
+.preview-stack { margin-top: 32px; display: grid; gap: 14px; }
+.tweet-card { padding: 18px; }
+.tweet-card.muted { color: #71767b; }
+.tweet-card p { white-space: pre-wrap; font-size: 18px; line-height: 1.45; }
+.tweet-head { gap: 10px; }
+.tweet-head span { display: block; color: #71767b; font-size: 14px; }
+.tweet-metrics { display: flex; justify-content: space-between; max-width: 440px; color: #71767b; margin-top: 18px; }
+.embed-status { min-height: 20px; color: #71767b; font-size: 14px; }
+.tweet-embed { max-width: 560px; }
+
+.transcript { padding: 16px; overflow: auto; min-height: 320px; display: flex; flex-direction: column; gap: 12px; }
+.message { max-width: 88%; white-space: pre-wrap; line-height: 1.45; border-radius: 18px; padding: 12px 14px; }
+.message.user { align-self: flex-end; color: white; background: #1d9bf0; }
+.message.assistant { align-self: flex-start; background: #101214; border: 1px solid #2f3336; }
+.agent-form { padding: 14px; }
+.agent-actions { margin-top: 12px; }
+
+@media (max-width: 860px) {
+  .shell { grid-template-columns: 1fr; }
+  .composer-pane { border-right: 0; border-bottom: 1px solid #2f3336; }
+  .pane { padding: 20px; }
+  .section-heading { align-items: stretch; flex-direction: column; }
+  #tweet-url { max-width: none; }
+}

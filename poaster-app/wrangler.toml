@@ -1,0 +1,29 @@
+name = "poaster"
+main = "worker/index.ts"
+workers_dev = true
+compatibility_date = "2026-06-16"
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = "dist"
+binding = "ASSETS"
+run_worker_first = true
+
+# Set secrets with `wrangler secret put ...` or `.dev.vars` locally:
+# AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN, AWS_REGION
+# or AWS_BEARER_TOKEN_BEDROCK, or OPENAI_CODEX_OAUTH_JSON + AGENT_LLM_PROVIDER=openai-codex.
+
+[[containers]]
+class_name = "Sandbox"
+image = "./sandbox-runtime/Dockerfile"
+image_build_context = "./sandbox-runtime"
+instance_type = "basic"
+max_instances = 10
+
+[[durable_objects.bindings]]
+name = "Sandbox"
+class_name = "Sandbox"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Sandbox"]
