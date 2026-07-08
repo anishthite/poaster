@@ -7,6 +7,7 @@
     "dev": "vite --host 127.0.0.1",
     "dev:cf": "vite build && wrangler dev --port=8789 --ip=127.0.0.1",
     "build": "vite build",
+    "deploy": "vite build && wrangler deploy --keep-vars",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "test": "node tests/composer.test.mjs",

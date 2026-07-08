@@ -1,0 +1,135 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="760" viewBox="0 0 1180 760" role="img" aria-labelledby="title desc">
+  <title id="title">Poaster architecture</title>
+  <desc id="desc">Browser UI talks to Cloudflare Worker APIs, which manage Sandbox sessions and stream Pi agent output back to the browser.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155" />
+    </marker>
+    <style>
+      .bg { fill: #f8fafc; }
+      .zone { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; rx: 22; }
+      .box { fill: #f1f5f9; stroke: #64748b; stroke-width: 1.5; rx: 14; }
+      .accent { fill: #ecfeff; stroke: #0891b2; }
+      .runtime { fill: #fef3c7; stroke: #d97706; }
+      .external { fill: #fce7f3; stroke: #db2777; }
+      .store { fill: #dcfce7; stroke: #16a34a; }
+      .title { font: 700 22px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #0f172a; }
+      .label { font: 700 15px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #0f172a; }
+      .small { font: 12px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #334155; }
+      .tiny { font: 11px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #475569; }
+      .arrow { stroke: #334155; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .mutedArrow { stroke: #94a3b8; stroke-width: 1.8; fill: none; marker-end: url(#arrow); stroke-dasharray: 5 5; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1180" height="760" />
+  <text x="40" y="44" class="title">Poaster architecture</text>
+  <text x="40" y="68" class="small">One Vite page + Cloudflare Worker API + Sandbox container running Pi. No app DB: chat history is browser-local; sandbox ids are deterministic.</text>
+
+  <rect class="zone" x="40" y="100" width="335" height="520" />
+  <text x="64" y="132" class="label">Browser / Vite static app</text>
+  <text x="64" y="152" class="tiny">poaster-app/src/*</text>
+
+  <rect class="box accent" x="64" y="180" width="287" height="92" />
+  <text x="84" y="207" class="label">UI shell</text>
+  <text x="84" y="229" class="small">src/main.js</text>
+  <text x="84" y="249" class="tiny">X-style composer + assistant pane</text>
+
+  <rect class="box" x="64" y="298" width="135" height="84" />
+  <text x="80" y="324" class="label">Composer</text>
+  <text x="80" y="346" class="small">composer.js</text>
+  <text x="80" y="366" class="tiny">count, intent URL,</text>
+
+  <rect class="box" x="216" y="298" width="135" height="84" />
+  <text x="232" y="324" class="label">API client</text>
+  <text x="232" y="346" class="small">agent-api.js</text>
+  <text x="232" y="366" class="tiny">fetch + SSE drain</text>
+
+  <rect class="box store" x="64" y="420" width="287" height="82" />
+  <text x="84" y="446" class="label">localStorage</text>
+  <text x="84" y="468" class="small">poaster:agentConversations:v1</text>
+  <text x="84" y="488" class="tiny">saved turns + active session metadata</text>
+
+  <rect class="zone" x="430" y="100" width="335" height="520" />
+  <text x="454" y="132" class="label">Cloudflare Worker</text>
+  <text x="454" y="152" class="tiny">poaster-app/worker + server</text>
+
+  <rect class="box accent" x="454" y="180" width="287" height="86" />
+  <text x="474" y="207" class="label">worker/index.ts</text>
+  <text x="474" y="229" class="small">/api/* → handleApiRequest</text>
+  <text x="474" y="249" class="tiny">else ASSETS.fetch(request)</text>
+
+  <rect class="box" x="454" y="292" width="287" height="100" />
+  <text x="474" y="319" class="label">server/routes/agent.ts</text>
+  <text x="474" y="341" class="small">sessions: create/start/stop/delete</text>
+  <text x="474" y="361" class="tiny">/pi/stream validates input, builds command,</text>
+  <text x="474" y="379" class="tiny">translates Pi JSON stdout → browser SSE</text>
+
+  <rect class="box" x="454" y="422" width="137" height="98" />
+  <text x="470" y="449" class="label">pi-runtime.ts</text>
+  <text x="470" y="471" class="small">prompt builder</text>
+  <text x="470" y="491" class="tiny">redacts secrets</text>
+
+  <rect class="box" x="604" y="422" width="137" height="98" />
+  <text x="620" y="449" class="label">sandbox client</text>
+  <text x="620" y="471" class="small">cloudflare-</text>
+  <text x="620" y="489" class="small">sandbox.ts</text>
+  <text x="620" y="509" class="tiny">exec + stream</text>
+
+  <rect class="zone" x="820" y="100" width="320" height="520" />
+  <text x="844" y="132" class="label">Cloudflare Sandbox container</text>
+  <text x="844" y="152" class="tiny">poaster-app/sandbox-runtime/*</text>
+
+  <rect class="box runtime" x="844" y="180" width="272" height="88" />
+  <text x="864" y="207" class="label">Dockerfile</text>
+  <text x="864" y="229" class="small">cloudflare/sandbox:0.12.1</text>
+  <text x="864" y="249" class="tiny">installs Pi + pi-web-access runtime</text>
+
+  <rect class="box runtime" x="844" y="298" width="272" height="114" />
+  <text x="864" y="325" class="label">pi-runner.js</text>
+  <text x="864" y="347" class="small">creates Pi agent session</text>
+  <text x="864" y="367" class="tiny">loads tools + skills, writes OAuth auth,</text>
+  <text x="864" y="385" class="tiny">streams event JSON on stdout</text>
+
+  <rect class="box store" x="844" y="446" width="272" height="74" />
+  <text x="864" y="473" class="label">/root/.pi + /workspace</text>
+  <text x="864" y="495" class="small">session jsonl + working dir</text>
+
+  <rect class="box external" x="64" y="655" width="287" height="70" />
+  <text x="84" y="682" class="label">X / Twitter</text>
+  <text x="84" y="704" class="small">intent/tweet + widgets.js embed</text>
+
+  <rect class="box external" x="844" y="655" width="272" height="70" />
+  <text x="864" y="682" class="label">LLM provider</text>
+  <text x="864" y="704" class="small">Bedrock or OpenAI Codex via env</text>
+
+  <path class="arrow" d="M351 340 C390 340 410 340 454 340" />
+  <text x="382" y="325" class="tiny">/api/agent/*</text>
+
+  <path class="arrow" d="M454 220 C420 220 395 220 351 220" />
+  <text x="375" y="207" class="tiny">assets</text>
+
+  <path class="arrow" d="M741 470 C790 470 804 355 844 355" />
+  <text x="768" y="420" class="tiny">exec(command)</text>
+
+  <path class="arrow" d="M844 370 C802 370 786 350 741 350" />
+  <text x="764" y="337" class="tiny">stdout JSON</text>
+
+  <path class="arrow" d="M741 340 C785 340 800 483 844 483" />
+  <text x="760" y="515" class="tiny">poaster-&lt;session id&gt;</text>
+
+  <path class="arrow" d="M980 412 L980 446" />
+
+  <path class="mutedArrow" d="M208 420 L208 272" />
+  <text x="222" y="399" class="tiny">restore chat</text>
+
+  <path class="mutedArrow" d="M208 272 C208 620 208 630 208 655" />
+  <text x="222" y="634" class="tiny">post / embed</text>
+
+  <path class="mutedArrow" d="M980 655 L980 412" />
+  <text x="994" y="626" class="tiny">model calls</text>
+
+  <path class="arrow" d="M741 342 C775 342 795 342 844 342" opacity="0" />
+
+  <text x="454" y="585" class="small">Streaming path: browser fetches text/event-stream → Worker emits SSE → Sandbox returns Pi event JSON → browser appends assistant deltas.</text>
+</svg>

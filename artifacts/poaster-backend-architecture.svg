@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="620" viewBox="0 0 1180 620" role="img" aria-labelledby="title desc">
+  <title id="title">Poaster backend architecture</title>
+  <desc id="desc">Browser talks to a Cloudflare Worker. The worker serves assets or routes API calls to a Cloudflare Sandbox Durable Object container that runs pi-runner.js.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/>
+    </marker>
+    <style>
+      .box{fill:#f8fafc;stroke:#334155;stroke-width:2;rx:16;ry:16}.sub{fill:#eef6ff}.edge{stroke:#334155;stroke-width:2.5;fill:none;marker-end:url(#arrow)}.dash{stroke-dasharray:7 6}.t{font:700 18px system-ui,-apple-system,Segoe UI,sans-serif;fill:#0f172a}.s{font:14px system-ui,-apple-system,Segoe UI,sans-serif;fill:#334155}.tiny{font:12px ui-monospace,SFMono-Regular,Menlo,monospace;fill:#475569}
+    </style>
+  </defs>
+
+  <rect x="28" y="26" width="1124" height="568" rx="24" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="56" y="62" class="t">Poaster backend: Cloudflare Worker + Sandbox container</text>
+  <text x="56" y="86" class="s">Docker image is configured in poaster-app/wrangler.toml and built from poaster-app/sandbox-runtime/Dockerfile.</text>
+
+  <rect x="70" y="145" width="230" height="130" class="box sub"/>
+  <text x="95" y="178" class="t">Browser UI</text>
+  <text x="95" y="205" class="s">React/Vite composer + chat</text>
+  <text x="95" y="229" class="tiny">src/App.jsx</text>
+  <text x="95" y="249" class="tiny">src/agent-api.js</text>
+
+  <rect x="405" y="120" width="270" height="180" class="box"/>
+  <text x="435" y="154" class="t">Cloudflare Worker</text>
+  <text x="435" y="181" class="s">Entry splits assets vs API</text>
+  <text x="435" y="205" class="tiny">worker/index.ts</text>
+  <text x="435" y="225" class="tiny">/api/* → server/index.ts</text>
+  <text x="435" y="245" class="tiny">else → env.ASSETS.fetch()</text>
+
+  <rect x="760" y="90" width="300" height="110" class="box sub"/>
+  <text x="790" y="124" class="t">Static assets</text>
+  <text x="790" y="151" class="s">Built Vite app served from dist</text>
+  <text x="790" y="175" class="tiny">wrangler [assets] binding: ASSETS</text>
+
+  <rect x="760" y="255" width="300" height="145" class="box"/>
+  <text x="790" y="289" class="t">Agent API routes</text>
+  <text x="790" y="316" class="s">Create/start/stop/delete sessions</text>
+  <text x="790" y="340" class="s">Stream pi turns as SSE</text>
+  <text x="790" y="364" class="tiny">server/routes/agent.ts</text>
+
+  <rect x="405" y="390" width="270" height="130" class="box sub"/>
+  <text x="435" y="424" class="t">Sandbox binding</text>
+  <text x="435" y="451" class="s">Durable Object namespace</text>
+  <text x="435" y="475" class="tiny">binding name: Sandbox</text>
+  <text x="435" y="495" class="tiny">provider id: poaster-&lt;id&gt;</text>
+
+  <rect x="760" y="445" width="300" height="120" class="box"/>
+  <text x="790" y="479" class="t">Container runtime</text>
+  <text x="790" y="506" class="s">cloudflare/sandbox base image</text>
+  <text x="790" y="530" class="tiny">sandbox-runtime/pi-runner.js</text>
+  <text x="790" y="550" class="tiny">@earendil-works/pi-coding-agent</text>
+
+  <line x1="300" y1="210" x2="405" y2="210" class="edge"/>
+  <text x="320" y="198" class="tiny">fetch /api + SSE</text>
+
+  <line x1="675" y1="175" x2="760" y2="145" class="edge dash"/>
+  <text x="690" y="134" class="tiny">non-API</text>
+
+  <line x1="675" y1="250" x2="760" y2="315" class="edge"/>
+  <text x="690" y="294" class="tiny">/api/agent/*</text>
+
+  <line x1="910" y1="400" x2="675" y2="455" class="edge"/>
+  <text x="700" y="427" class="tiny">CloudflareSandboxClient</text>
+
+  <line x1="675" y1="475" x2="760" y2="505" class="edge"/>
+  <text x="690" y="505" class="tiny">exec(command, stream:true)</text>
+
+  <path d="M 760 545 C 690 590, 300 590, 225 276" class="edge dash"/>
+  <text x="360" y="577" class="tiny">stdout JSON events → worker SSE → UI</text>
+</svg>
