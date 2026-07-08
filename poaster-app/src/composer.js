@@ -1,5 +1,17 @@
 export const MAX_TWEET_CHARS = 280;
 
+const STARTER_AGENT_PROMPTS = [
+  'Help me find a sharp angle for a post.',
+  'Draft 5 punchy post ideas from a rough thought.',
+  'Give me hooks for something people will actually read.',
+];
+
+const DRAFT_AGENT_PROMPTS = [
+  'Critique the composer draft. Be blunt, then give a cleaner version.',
+  'Make the composer draft punchier without changing the point.',
+  'Give me 5 alternate hooks for the composer draft.',
+];
+
 export function countTweetChars(text) {
   // ponytail: X has weighted URLs/CJK rules; swap in official twitter-text if exact parity matters.
   return [...String(text || '')].length;
@@ -18,6 +30,10 @@ export function buildTweetIntentUrl(text) {
   const url = new URL('https://twitter.com/intent/tweet');
   url.searchParams.set('text', String(text || '').trim());
   return url.toString();
+}
+
+export function getSuggestedAgentPrompts(text) {
+  return String(text || '').trim() ? DRAFT_AGENT_PROMPTS : STARTER_AGENT_PROMPTS;
 }
 
 export function tweetIdFromUrl(value) {

@@ -15,7 +15,7 @@ import {
   Upload,
 } from 'lucide-react';
 import { createAgentSession, startAgentSession, stopAgentSession, streamPiTurn } from './agent-api.js';
-import { buildTweetIntentUrl, isTweetLengthOk, remainingTweetChars } from './composer.js';
+import { buildTweetIntentUrl, getSuggestedAgentPrompts, isTweetLengthOk, remainingTweetChars } from './composer.js';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -53,6 +53,7 @@ export function App() {
   const streamControllerRef = useRef(null);
   const autoStopTimerRef = useRef(null);
   const transcriptRef = useRef(null);
+  const agentMessageRef = useRef(null);
 
   useEffect(() => { conversationsRef.current = conversations; }, [conversations]);
   useEffect(() => { activeRef.current = activeConversation; }, [activeConversation]);
@@ -70,6 +71,7 @@ export function App() {
   const left = remainingTweetChars(draft);
   const canPost = draft.trim() && isTweetLengthOk(draft);
   const messages = assistantDraft === null ? turns : [...turns, { role: 'assistant', content: assistantDraft }];
+  const suggestedPrompts = getSuggestedAgentPrompts(draft);
 
   async function sendAgentMessage(event) {
     event.preventDefault();
@@ -212,6 +214,12 @@ export function App() {
     setStatusState({ text, state });
   }
 
+  function fillAgentPrompt(prompt) {
+    if (!agentMessageRef.current) return;
+    agentMessageRef.current.value = prompt;
+    agentMessageRef.current.focus();
+  }
+
   return (
     <main className="mx-auto grid min-h-screen min-h-dvh w-full max-w-[1180px] grid-cols-[minmax(0,600px)_minmax(0,1fr)] border-x border-border bg-background text-foreground max-[860px]:grid-cols-1 max-[860px]:border-x-0">
       <section className="min-w-0 border-r border-border max-[860px]:border-r-0 max-[860px]:border-b" aria-label="Post composer">
@@ -287,13 +295,19 @@ export function App() {
 
         <Card className="min-h-80 overflow-hidden rounded-3xl bg-background max-[520px]:min-h-64 max-[520px]:rounded-2xl">
           <CardContent ref={transcriptRef} className="flex h-full max-h-[calc(100dvh-260px)] min-h-80 flex-col gap-3 overflow-auto p-4 max-[520px]:max-h-[calc(100dvh-230px)] max-[520px]:min-h-64 max-[520px]:p-3">
-            {messages.length === 0 ? <Message role="assistant" text="Ask for punchier wording, variants, hooks, or implementation help." /> : null}
+            {messages.length === 0 ? <Message role="assistant" text="Ask for punchier wording, variants, hooks, or a critique. I can see the composer draft automatically." /> : null}
             {messages.map((turn, index) => <Message key={`${turn.role}-${index}`} role={turn.role} text={turn.content} />)}
           </CardContent>
         </Card>
 
         <form onSubmit={sendAgentMessage} className="rounded-3xl border border-border bg-background p-4 max-[520px]:rounded-2xl max-[520px]:p-3">
-          <Textarea name="agentMessage" rows={3} placeholder="Help me improve this post…" className="resize-y border-0 bg-transparent p-0 text-foreground shadow-none focus-visible:ring-0 dark:bg-transparent" />
+          <div className="mb-3 flex flex-wrap gap-2" aria-label="Suggested prompts">
+            {suggestedPrompts.map((prompt) => (
+              <Button key={prompt} type="button" variant="secondary" size="sm" className="h-auto rounded-full px-3 py-1.5 text-left text-xs whitespace-normal" onClick={() => fillAgentPrompt(prompt)}>{prompt}</Button>
+            ))}
+          </div>
+          <p className="mb-2 text-xs text-muted-foreground">Composer text is included automatically.</p>
+          <Textarea ref={agentMessageRef} name="agentMessage" rows={3} placeholder="Help me improve this post…" className="resize-y border-0 bg-transparent p-0 text-foreground shadow-none focus-visible:ring-0 dark:bg-transparent" />
           <div className="mt-3 flex justify-end max-[420px]:justify-stretch">
             <Button type="submit" disabled={inflight} className="rounded-full bg-sky-500 text-white hover:bg-sky-600 max-[420px]:w-full"><Send /> send</Button>
           </div>

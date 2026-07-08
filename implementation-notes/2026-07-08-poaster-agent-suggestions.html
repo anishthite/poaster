@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Poaster agent suggestions</title><meta name="task" content="Add assistant suggested prompts and composer context clarity"><meta name="date-started" content="2026-07-08"><meta name="status" content="shipped"><meta name="blast-radius" content="low"><meta name="tags" content="poaster,react,agent,composer"><meta name="related" content="implementation-notes/2026-07-08-poaster-agent-lifecycle.html, implementation-notes/2026-07-08-poaster-mobile-optimization.html"></head><body>
+<h1>Poaster agent suggestions</h1>
+<p class="meta">branch: main · worktree: /Users/anishthite/workspace/poaster · date: 2026-07-08 · status: shipped · blast: low</p>
+<h2>Summary</h2>
+<table><tbody>
+<tr><th>Goal</th><td>Add prompt chips for first-use drafting and composer-aware critique.</td></tr>
+<tr><th>Source</th><td>User asked for suggested prompts, onboarding, tweet critique, and composer visibility.</td></tr>
+<tr><th>Surface</th><td><code>poaster-app/src/App.jsx</code>, <code>poaster-app/src/composer.js</code>, <code>poaster-app/server/lib/pi-runtime.ts</code>.</td></tr>
+<tr><th>Schema</th><td>None.</td></tr>
+<tr><th>Mobile</th><td>Prompt chips wrap inside the existing assistant form.</td></tr>
+<tr><th>Open Qs</th><td>0.</td></tr>
+<tr><th>Check</th><td><code>cd poaster-app && npm run check</code>.</td></tr>
+</tbody></table>
+<h2>UI layout</h2>
+<ol>
+<li><b>Empty composer</b>: Show starter chips that fill the assistant box.</li>
+<li><b>Drafted composer</b>: Show critique and rewrite chips for the current composer text.</li>
+<li><b>Context hint</b>: State that composer text is included automatically.</li>
+</ol>
+<h2>Files</h2>
+<table><thead><tr><th>Path</th><th>Kind</th><th>Delta</th></tr></thead><tbody>
+<tr><td><code>poaster-app/src/App.jsx</code></td><td>touch</td><td>Render prompt chips and wire them to the assistant textarea.</td></tr>
+<tr><td><code>poaster-app/src/composer.js</code></td><td>touch</td><td>Export a tiny prompt list helper keyed by composer text.</td></tr>
+<tr><td><code>poaster-app/tests/composer.test.mjs</code></td><td>touch</td><td>Assert starter and critique prompt modes.</td></tr>
+<tr><td><code>poaster-app/server/lib/pi-runtime.ts</code></td><td>touch</td><td>Label the draft context as composer text in the runtime prompt.</td></tr>
+</tbody></table>
+<h2>Decisions</h2>
+<table><thead><tr><th>ID</th><th>Choice · Rationale</th></tr></thead><tbody>
+<tr><td>D-001</td><td>Use static prompt chips instead of a prompt-template system. Three starter and three critique prompts cover the requested path.</td></tr>
+<tr><td>D-002</td><td>Fill the textarea rather than auto-submit chips. Users can edit before spending an agent turn.</td></tr>
+</tbody></table>
+<h2>Tradeoffs</h2>
+<table><thead><tr><th>ID</th><th>Picked over Rejected · Reason</th></tr></thead><tbody>
+<tr><td>T-001</td><td><code>composer.js</code> helper over React state. Existing tests can cover the branch without browser tooling.</td></tr>
+</tbody></table>
+<h2>Reversibility</h2>
+<p>R-001 · <span class="blast-low">low</span>. Revert the prompt helper, UI chips, test assertions, and runtime label copy.</p>
+<h2>Definition of done</h2>
+<ul><li>Starter prompts appear for an empty composer.</li><li>Critique prompts appear when composer text exists.</li><li>Runtime prompt includes composer draft text.</li><li><code>cd poaster-app && npm run check</code> passes.</li></ul>
+</body></html>
