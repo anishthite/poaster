@@ -1,0 +1,15 @@
+{
+  "name": "twitter-daily",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "run": "bin/run-daily.sh",
+    "render": "node scripts/render.mjs",
+    "serve": "node scripts/server.mjs",
+    "cli": "node scripts/cli.mjs",
+    "test": "node tests/render.test.mjs",
+    "check": "npm run test && npm run render",
+    "auth": "bin/open-authorized-pi.sh"
+  }
+}

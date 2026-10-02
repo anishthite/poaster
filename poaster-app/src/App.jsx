@@ -2,16 +2,11 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   BarChart3,
   BadgeCheck,
-  Globe2,
   Heart,
-  Image,
-  MapPin,
   MessageCircle,
   MoreHorizontal,
   Repeat2,
   Send,
-  Smile,
-  Sparkles,
   Upload,
 } from 'lucide-react';
 import { createAgentSession, startAgentSession, stopAgentSession, streamPiTurn } from './agent-api.js';
@@ -36,7 +31,6 @@ export function App() {
   }, []);
 
   const [draft, setDraft] = useState('');
-  const [postedPreview, setPostedPreview] = useState('');
   const [conversations, setConversations] = useState(initial.conversations);
   const [activeConversation, setActiveConversation] = useState(initial.active);
   const [session, setSession] = useState(initial.active?.session || null);
@@ -69,7 +63,7 @@ export function App() {
   }, []);
 
   const left = remainingTweetChars(draft);
-  const canPost = draft.trim() && isTweetLengthOk(draft);
+  const canPost = Boolean(draft.trim() && isTweetLengthOk(draft));
   const messages = assistantDraft === null ? turns : [...turns, { role: 'assistant', content: assistantDraft }];
   const suggestedPrompts = getSuggestedAgentPrompts(draft);
 
@@ -95,7 +89,7 @@ export function App() {
       const result = await streamPiTurn(live.id, {
         message,
         draft,
-        postedPreview,
+        postedPreview: draft.trim(),
         history: nextTurns.slice(0, -1).slice(-12),
       }, (agentEvent) => {
         if (agentEvent.type === 'status') setStatus(cleanStatus(agentEvent.message || 'running'), 'running');
@@ -239,48 +233,8 @@ export function App() {
           </Tabs>
         </header>
 
-        <section className="grid min-w-0 grid-cols-[40px_1fr] gap-3 border-b border-border p-4 max-[520px]:grid-cols-[32px_1fr] max-[520px]:gap-2 max-[520px]:p-3">
-          <Avatar className="mt-1 bg-gradient-to-br from-sky-500 to-violet-500 text-white max-[520px]:size-8">
-            <AvatarFallback className="bg-transparent font-black text-white">P</AvatarFallback>
-          </Avatar>
-          <div className="min-w-0">
-            <Textarea
-              value={draft}
-              onChange={(event) => setDraft(event.target.value)}
-              maxLength={560}
-              placeholder="What is happening?!"
-              aria-label="Post draft"
-              className="min-h-28 resize-y border-0 bg-transparent px-0 text-xl text-foreground shadow-none focus-visible:ring-0 dark:bg-transparent max-[520px]:min-h-24 max-[520px]:text-lg"
-            />
-            <Button variant="ghost" size="sm" className="mb-2 h-7 rounded-full px-2 font-bold text-sky-400 hover:text-sky-300">
-              <Globe2 /> Everyone can reply
-            </Button>
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-3 max-[520px]:gap-2">
-              <div className="flex flex-wrap text-sky-400">
-                {[Image, Sparkles, BarChart3, Smile, MapPin].map((Icon, index) => <Button key={index} type="button" variant="ghost" size="icon-sm"><Icon /></Button>)}
-              </div>
-              <div className="flex flex-wrap items-center justify-end gap-3 max-[520px]:w-full max-[520px]:justify-between max-[520px]:gap-2">
-                <span className={cn('text-sm text-muted-foreground', left < 0 && 'font-bold text-destructive')}>{left}</span>
-                <Button type="button" variant="outline" disabled={!draft.trim()} className="max-[420px]:px-3" onClick={() => setPostedPreview(draft.trim())}>Preview</Button>
-                <a
-                  className={cn(buttonVariants({ size: 'lg' }), 'rounded-full bg-sky-500 text-white hover:bg-sky-600 max-[420px]:px-3', !canPost && 'pointer-events-none opacity-50')}
-                  href={buildTweetIntentUrl(draft)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Post on X
-                </a>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="grid gap-4 p-4 max-[520px]:gap-3 max-[520px]:p-3" aria-label="Tweet preview">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground">Preview</p>
-            <h2 className="text-lg font-bold">Tweet preview</h2>
-          </div>
-          <DraftTweetCard text={postedPreview || draft.trim()} muted={!postedPreview && !draft.trim()} />
+        <section className="grid gap-4 border-b border-border p-4 max-[520px]:gap-3 max-[520px]:p-3" aria-label="Post composer">
+          <DraftTweetCard text={draft} onTextChange={setDraft} remaining={left} canPost={canPost} />
         </section>
       </section>
 
@@ -295,7 +249,7 @@ export function App() {
 
         <Card className="min-h-80 overflow-hidden rounded-3xl bg-background max-[520px]:min-h-64 max-[520px]:rounded-2xl">
           <CardContent ref={transcriptRef} className="flex h-full max-h-[calc(100dvh-260px)] min-h-80 flex-col gap-3 overflow-auto p-4 max-[520px]:max-h-[calc(100dvh-230px)] max-[520px]:min-h-64 max-[520px]:p-3">
-            {messages.length === 0 ? <Message role="assistant" text="Ask for punchier wording, variants, hooks, or a critique. I can see the composer draft automatically." /> : null}
+            {messages.length === 0 ? <Message role="assistant" text="Ask for punchier wording, variants, hooks, or a critique. I can see the draft automatically." /> : null}
             {messages.map((turn, index) => <Message key={`${turn.role}-${index}`} role={turn.role} text={turn.content} />)}
           </CardContent>
         </Card>
@@ -306,7 +260,7 @@ export function App() {
               <Button key={prompt} type="button" variant="secondary" size="sm" className="h-auto rounded-full px-3 py-1.5 text-left text-xs whitespace-normal" onClick={() => fillAgentPrompt(prompt)}>{prompt}</Button>
             ))}
           </div>
-          <p className="mb-2 text-xs text-muted-foreground">Composer text is included automatically.</p>
+          <p className="mb-2 text-xs text-muted-foreground">Draft text is included automatically.</p>
           <Textarea ref={agentMessageRef} name="agentMessage" rows={3} placeholder="Help me improve this post…" className="resize-y border-0 bg-transparent p-0 text-foreground shadow-none focus-visible:ring-0 dark:bg-transparent" />
           <div className="mt-3 flex justify-end max-[420px]:justify-stretch">
             <Button type="submit" disabled={inflight} className="rounded-full bg-sky-500 text-white hover:bg-sky-600 max-[420px]:w-full"><Send /> send</Button>
@@ -317,7 +271,7 @@ export function App() {
   );
 }
 
-function DraftTweetCard({ text, muted }) {
+function DraftTweetCard({ text, onTextChange, remaining, canPost }) {
   return (
     <Card className="w-full max-w-[560px] rounded-2xl border-[#2f3336] bg-black text-[#e7e9ea] shadow-none">
       <CardHeader className="flex flex-row items-start gap-3 px-4 pt-4 pb-0 max-[520px]:px-3 max-[520px]:pt-3">
@@ -334,16 +288,30 @@ function DraftTweetCard({ text, muted }) {
         <Button variant="ghost" size="icon-sm" className="rounded-full text-[#71767b]"><MoreHorizontal /></Button>
       </CardHeader>
       <CardContent className="px-4 pb-4 pt-3 max-[520px]:px-3 max-[520px]:pb-3">
-        {muted ? (
-          <p className="text-[#71767b]">Draft something, then preview it here.</p>
-        ) : (
-          <p className="whitespace-pre-wrap break-words text-xl leading-7 max-[520px]:text-lg">{text}</p>
-        )}
+        <Textarea
+          value={text}
+          onChange={(event) => onTextChange(event.target.value)}
+          maxLength={560}
+          placeholder="What is happening?!"
+          aria-label="Post draft"
+          className="min-h-32 resize-y border-0 bg-transparent p-0 text-xl leading-7 text-[#e7e9ea] shadow-none placeholder:text-[#71767b] focus-visible:ring-0 dark:bg-transparent max-[520px]:min-h-28 max-[520px]:text-lg"
+        />
         <div className="mt-4 text-sm text-[#71767b] max-[520px]:text-xs">12:00 PM · Jul 8, 2026 · <span className="text-[#e7e9ea]">0</span> Views</div>
         <div className="mt-4 grid grid-cols-5 border-y border-[#2f3336] py-2 text-[#71767b]">
           {[MessageCircle, Repeat2, Heart, BarChart3, Upload].map((Icon, index) => <span key={index} className="flex items-center justify-center"><Icon className="size-5" /></span>)}
         </div>
-        <Button variant="outline" className="mt-4 w-full rounded-full border-[#536471] bg-transparent font-bold text-[#1d9bf0] hover:bg-[#031018] hover:text-[#1d9bf0]">Read replies</Button>
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+          <span className={cn('text-sm text-[#71767b]', remaining < 0 && 'font-bold text-destructive')}>{remaining}</span>
+          <a
+            className={cn(buttonVariants({ size: 'lg' }), 'rounded-full bg-sky-500 text-white hover:bg-sky-600 max-[420px]:w-full', !canPost && 'pointer-events-none opacity-50')}
+            href={canPost ? buildTweetIntentUrl(text) : undefined}
+            aria-disabled={!canPost}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Post on X
+          </a>
+        </div>
       </CardContent>
     </Card>
   );

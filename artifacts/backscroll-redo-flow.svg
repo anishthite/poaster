@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="420" viewBox="0 0 1040 420" role="img" aria-label="Minimal Backscroll-style personal feed compiler architecture">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/>
+    </marker>
+    <style>
+      .box{fill:#f8fafc;stroke:#334155;stroke-width:2;rx:14;ry:14}
+      .hot{fill:#ecfeff;stroke:#0891b2}
+      .slow{fill:#fff7ed;stroke:#ea580c}
+      .skip{fill:#f1f5f9;stroke:#94a3b8;stroke-dasharray:6 5}
+      .title{font:700 18px ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;fill:#0f172a}
+      .text{font:14px ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;fill:#334155}
+      .small{font:12px ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;fill:#64748b}
+      .arrow{stroke:#334155;stroke-width:2;fill:none;marker-end:url(#arrow)}
+    </style>
+  </defs>
+
+  <text x="32" y="36" class="title">Redo: personal feed compiler, not a social app</text>
+  <text x="32" y="60" class="small">Hot path stays deterministic; LLMs run offline or on explicit curated requests.</text>
+
+  <rect x="32" y="96" width="160" height="92" class="box"/>
+  <text x="52" y="128" class="title">Ingest</text>
+  <text x="52" y="154" class="text">timeline · likes</text>
+  <text x="52" y="174" class="text">bookmarks</text>
+
+  <rect x="252" y="96" width="170" height="92" class="box"/>
+  <text x="272" y="128" class="title">Raw store</text>
+  <text x="272" y="154" class="text">dedupe + normalize</text>
+  <text x="272" y="174" class="text">items, authors</text>
+
+  <rect x="482" y="96" width="190" height="92" class="box hot"/>
+  <text x="502" y="128" class="title">Rank</text>
+  <text x="502" y="154" class="text">SQL lanes + weights</text>
+  <text x="502" y="174" class="text">MMR diversity</text>
+
+  <rect x="732" y="96" width="170" height="92" class="box hot"/>
+  <text x="752" y="128" class="title">Publish</text>
+  <text x="752" y="154" class="text">cached session</text>
+  <text x="752" y="174" class="text">instant reads</text>
+
+  <rect x="732" y="252" width="170" height="92" class="box"/>
+  <text x="752" y="284" class="title">Feedback</text>
+  <text x="752" y="310" class="text">more/less · save</text>
+  <text x="752" y="330" class="text">dwell labels</text>
+
+  <rect x="482" y="252" width="190" height="92" class="box slow"/>
+  <text x="502" y="284" class="title">LLM offline</text>
+  <text x="502" y="310" class="text">rubric edits</text>
+  <text x="502" y="330" class="text">curated one-offs</text>
+
+  <rect x="252" y="252" width="170" height="92" class="box skip"/>
+  <text x="272" y="284" class="title">Later</text>
+  <text x="272" y="310" class="text">4 frontends</text>
+  <text x="272" y="330" class="text">learned ranker</text>
+
+  <path class="arrow" d="M192 142 H252"/>
+  <path class="arrow" d="M422 142 H482"/>
+  <path class="arrow" d="M672 142 H732"/>
+  <path class="arrow" d="M817 188 V252"/>
+  <path class="arrow" d="M732 298 H672"/>
+  <path class="arrow" d="M577 252 V188"/>
+  <path class="arrow" d="M482 298 H422"/>
+
+  <text x="32" y="392" class="small">Minimum viable version: one scraper, one table, one ranked digest, one feedback loop, one status page.</text>
+</svg>

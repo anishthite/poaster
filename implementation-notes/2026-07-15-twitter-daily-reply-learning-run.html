@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Twitter Daily reply learning run 2026-07-15</title>
+<meta name="task" content="Run the 2026-07-15 reply-learning scrape and guidance update">
+<meta name="date-started" content="2026-07-15">
+<meta name="date-updated" content="2026-07-15">
+<meta name="status" content="shipped">
+<meta name="blast-radius" content="low">
+<meta name="tags" content="twitter-daily,reply-learnings,x-scrape,guidance,data">
+<meta name="related" content="2026-07-13-twitter-daily-reply-learning-run.html">
+<style>
+  body { font: 14px/1.45 -apple-system, system-ui, sans-serif; max-width: 880px; margin: 1.5rem auto; padding: 0 1rem; color: #111; }
+  h1 { font-size: 20px; margin: 0 0 .25rem; }
+  h2 { font-size: 15px; margin: 1.4rem 0 .4rem; border-bottom: 1px solid #ddd; padding-bottom: .2rem; }
+  table { border-collapse: collapse; width: 100%; margin: .4rem 0 .8rem; }
+  th, td { border: 1px solid #ddd; padding: 4px 8px; text-align: left; vertical-align: top; }
+  th { background: #f6f6f6; font-weight: 600; }
+  code, pre { font-family: ui-monospace, Menlo, monospace; }
+  code { background: #f1f1f1; padding: 1px 4px; border-radius: 3px; font-size: 12.5px; }
+  ul, ol { margin: .3rem 0 .8rem 1.2rem; padding: 0; }
+  li { margin: .15rem 0; }
+  .blast-low { color: #2a7a2a; }
+  .meta { color: #555; font-size: 12.5px; margin-bottom: .8rem; }
+  .kv { display: grid; grid-template-columns: 140px 1fr; gap: 2px 14px; font-size: 13px; margin: .4rem 0 1rem; }
+  .kv b { color: #444; font-weight: 600; }
+</style>
+</head>
+<body>
+<h1>Twitter Daily reply learning run 2026-07-15</h1>
+<p class="meta"><code>main</code> · worktree <code>/Users/anishthite/workspace/poaster</code> · 2026-07-15 · status <b>shipped</b> · blast <span class="blast-low">low</span></p>
+
+<h2>Summary</h2>
+<div class="kv">
+  <b>Goal</b><div>Write reply-learning raw data, digest, state, and durable reply guidance for <code>2026-07-15</code>.</div>
+  <b>Source</b><div>Signed-in Chrome on <code>x.com/home</code>; no X API.</div>
+  <b>Surface</b><div><code>twitter-daily/data/*</code> and <code>poaster-app/sandbox-runtime/reply-guidance.md</code>.</div>
+  <b>Schema</b><div>Use existing raw/digest/state JSON shapes; wrote <code>14</code> raw items and <code>4</code> learnings.</div>
+  <b>Mobile</b><div>Untouched.</div>
+  <b>Open Qs</b><div>0.</div>
+</div>
+
+<h2>Algorithm</h2>
+<ol>
+  <li>Read visible home timeline <code>article</code> nodes with synchronous <code>chrome_evaluate</code>.</li>
+  <li>Open <code>3-8</code> promising tweet URLs and collect visible original/reply <code>article</code> nodes plus metrics.</li>
+  <li>Deduplicate by <code>url</code>, cap at <code>40</code>, then distill <code>3-7</code> grounded reply lessons.</li>
+  <li>Append at most <code>3</code> reply-guidance bullets only when repeated evidence supports them.</li>
+</ol>
+
+<h2>Files</h2>
+<table>
+  <tr><th>Path</th><th>Kind</th><th>Delta</th></tr>
+  <tr><td><code>twitter-daily/data/raw/2026-07-15-reply-learnings.json</code></td><td>new</td><td>Store scraped originals and visible replies.</td></tr>
+  <tr><td><code>twitter-daily/data/digests/2026-07-15-reply-learnings.json</code></td><td>new</td><td>Store distilled reply-writing lessons.</td></tr>
+  <tr><td><code>poaster-app/sandbox-runtime/reply-guidance.md</code></td><td>touch</td><td>Add durable reply rules if the scrape supports them.</td></tr>
+  <tr><td><code>twitter-daily/data/state.json</code></td><td>touch</td><td>Record latest successful reply-learning output paths and seen IDs.</td></tr>
+  <tr><td><code>implementation-notes/INDEX.html</code></td><td>touch</td><td>Add this note row.</td></tr>
+</table>
+
+<h2>Decisions</h2>
+<table>
+  <tr><th>ID</th><th>Choice · Rationale</th></tr>
+  <tr><td>D-001</td><td>Use <code>home-feed-replies</code> without a target URL. The run config explicitly sets <code>target tweet URL: none</code>.</td></tr>
+  <tr><td>D-002</td><td>Prefer visible reply metrics and direct author exchanges. These best support durable reply rules.</td></tr>
+</table>
+
+<h2>Deviations</h2>
+<table>
+  <tr><th>ID</th><th>From spec · Did · Reason</th></tr>
+  <tr><td>X-001</td><td>Spec allows up to <code>40</code> items; wrote <code>14</code> items from <code>3</code> opened tweets because home scrolling stopped producing useful visible posts.</td></tr>
+  <tr><td>X-002</td><td>Guidance update step made no markdown changes; existing reply rules already cover specificity, scope fit, and avoiding pure praise.</td></tr>
+</table>
+
+<h2>Assumptions</h2>
+<ul>
+  <li>A-001 · Chrome remains authorized and signed in. If wrong: stop without writing invented data.</li>
+</ul>
+
+<h2>Reversibility</h2>
+<p>R-001 · <span class="blast-low">low</span>. Delete the generated <code>2026-07-15</code> JSON files and revert the guidance/state edits.</p>
+
+<h2>Definition of done</h2>
+<ul>
+  <li>Raw JSON matches the required schema and contains only scraped visible data.</li>
+  <li>Digest JSON includes <code>3-7</code> lessons or caveats if data is thin.</li>
+  <li><code>reply-guidance.md</code> changes by at most <code>3</code> bullets or stays unchanged with caveat.</li>
+  <li><code>state.json</code> names all written outputs.</li>
+</ul>
+</body>
+</html>

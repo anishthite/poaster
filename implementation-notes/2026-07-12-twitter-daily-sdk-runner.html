@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Twitter Daily SDK runner</title>
+<meta name="task" content="Replace the terminal runner with a Pi SDK-backed web runner">
+<meta name="date-started" content="2026-07-12">
+<meta name="date-updated" content="2026-07-12">
+<meta name="status" content="shipped">
+<meta name="blast-radius" content="low">
+<meta name="tags" content="twitter-daily,sdk,pi-chrome,web">
+<meta name="related" content="implementation-notes/2026-07-12-twitter-daily-guided-log-stream.html, implementation-notes/2026-07-10-twitter-daily-web-guided-runner.html">
+<style>
+  body { font: 14px/1.45 -apple-system, system-ui, sans-serif; max-width: 880px; margin: 1.5rem auto; padding: 0 1rem; color: #111; }
+  h1 { font-size: 20px; margin: 0 0 .25rem; }
+  h2 { font-size: 15px; margin: 1.4rem 0 .4rem; border-bottom: 1px solid #ddd; padding-bottom: .2rem; }
+  table { border-collapse: collapse; width: 100%; margin: .4rem 0 .8rem; }
+  th, td { border: 1px solid #ddd; padding: 4px 8px; text-align: left; vertical-align: top; }
+  th { background: #f6f6f6; font-weight: 600; }
+  code { background: #f1f1f1; padding: 1px 4px; border-radius: 3px; font-size: 12.5px; }
+  .blast-low { color: #2a7a2a; }
+  .meta { color: #555; font-size: 12.5px; margin-bottom: .8rem; }
+  .kv { display: grid; grid-template-columns: 140px 1fr; gap: 2px 14px; font-size: 13px; margin: .4rem 0 1rem; }
+  .kv b { color: #444; font-weight: 600; }
+</style>
+</head>
+<body>
+<h1>Twitter Daily SDK runner</h1>
+<p class="meta"><code>main</code> · worktree <code>/Users/anishthite/workspace/poaster</code> · 2026-07-12 · status <b>shipped</b> · blast <span class="blast-low">low</span></p>
+
+<h2>Summary</h2>
+<div class="kv">
+  <b>Goal</b><div>Run authorization and scrape in one long-lived Pi SDK session.</div>
+  <b>Source</b><div>Pi SDK <code>DefaultResourceLoader</code> discovers installed <code>pi-chrome</code>.</div>
+  <b>Surface</b><div><code>POST /api/authorize</code>, <code>POST /api/run</code>, <code>GET /api/log</code>.</div>
+  <b>Schema</b><div>None.</div>
+  <b>Mobile</b><div>Button/status copy only.</div>
+  <b>Open Qs</b><div>0.</div>
+</div>
+
+<h2>Files</h2>
+<table>
+  <tr><th>Path</th><th>Kind</th><th>Delta</th></tr>
+  <tr><td><code>twitter-daily/scripts/server.mjs</code></td><td>touch</td><td>Embed Pi SDK, provide web UI confirmation, run daily prompt, and render after success.</td></tr>
+  <tr><td><code>twitter-daily/scripts/render.mjs</code></td><td>touch</td><td>Replace Terminal wording with SDK runner controls.</td></tr>
+  <tr><td><code>twitter-daily/tests/render.test.mjs</code></td><td>touch</td><td>Assert SDK runner copy exists.</td></tr>
+  <tr><td><code>twitter-daily/public/index.html</code></td><td>generated</td><td>Refresh static web shell.</td></tr>
+  <tr><td><code>implementation-notes/INDEX.html</code></td><td>touch</td><td>Add this note row.</td></tr>
+</table>
+
+<h2>Decisions</h2>
+<table>
+  <tr><th>ID</th><th>Choice · Rationale</th></tr>
+  <tr><td>D-001</td><td>Use one in-memory SDK session per server process. <code>pi-chrome</code> authorization is session-local.</td></tr>
+  <tr><td>D-002</td><td>Auto-approve only the next <code>/chrome authorize</code> confirmation from a token-protected web click. Keeps arbitrary extension confirms denied.</td></tr>
+  <tr><td>D-003</td><td>Resolve the SDK from the installed <code>pi</code> binary when the package is not a local dependency. Avoids adding a heavy dependency to the tiny app.</td></tr>
+</table>
+
+<h2>Tradeoffs</h2>
+<table>
+  <tr><th>ID</th><th>Picked over Rejected · Reason</th></tr>
+  <tr><td>T-001</td><td>SDK session over Terminal runner. Streaming and authorization live in one process.</td></tr>
+  <tr><td>T-002</td><td>Polling log over SSE. Existing page polling already works.</td></tr>
+</table>
+
+<h2>Assumptions</h2>
+<ul>
+  <li>A-001 · <code>pi</code> is on <code>PATH</code> if <code>@earendil-works/pi-coding-agent</code> is not installed locally. If wrong: set <code>PI_CODING_AGENT_SDK_PATH</code>.</li>
+</ul>
+
+<h2>Reversibility</h2>
+<p>R-001 · <span class="blast-low">low</span>. Revert the server, renderer, generated HTML, and test edits to restore Terminal launching.</p>
+
+<h2>Definition of done</h2>
+<ul>
+  <li><code>npm run render</code> passes.</li>
+  <li><code>npm test</code> passes.</li>
+  <li>Server endpoints start without Terminal.</li>
+  <li><code>POST /api/authorize</code> authorizes through SDK UI confirmation.</li>
+</ul>
+</body>
+</html>

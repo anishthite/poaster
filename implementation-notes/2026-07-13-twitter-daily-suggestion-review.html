@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Twitter Daily suggestion review</title>
+<meta name="task" content="Review suggested posts and replies with saved approval feedback">
+<meta name="date-started" content="2026-07-13">
+<meta name="date-updated" content="2026-07-13">
+<meta name="status" content="ready-for-review">
+<meta name="blast-radius" content="low">
+<meta name="tags" content="twitter-daily,suggestions,review,training,web">
+<meta name="related" content="implementation-notes/2026-07-13-twitter-daily-guidance-suggestions.html">
+<style>
+  body { font: 14px/1.45 -apple-system, system-ui, sans-serif; max-width: 880px; margin: 1.5rem auto; padding: 0 1rem; color: #111; }
+  h1 { font-size: 20px; margin: 0 0 .25rem; }
+  h2 { font-size: 15px; margin: 1.4rem 0 .4rem; border-bottom: 1px solid #ddd; padding-bottom: .2rem; }
+  table { border-collapse: collapse; width: 100%; margin: .4rem 0 .8rem; }
+  th, td { border: 1px solid #ddd; padding: 4px 8px; text-align: left; vertical-align: top; }
+  th { background: #f6f6f6; font-weight: 600; }
+  code, pre { font-family: ui-monospace, Menlo, monospace; }
+  code { background: #f1f1f1; padding: 1px 4px; border-radius: 3px; font-size: 12.5px; }
+  ul, ol { margin: .3rem 0 .8rem 1.2rem; padding: 0; }
+  li { margin: .15rem 0; }
+  .blast-low { color: #2a7a2a; }
+  .meta { color: #555; font-size: 12.5px; margin-bottom: .8rem; }
+  .kv { display: grid; grid-template-columns: 140px 1fr; gap: 2px 14px; font-size: 13px; margin: .4rem 0 1rem; }
+  .kv b { color: #444; font-weight: 600; }
+</style>
+</head>
+<body>
+<h1>Twitter Daily suggestion review</h1>
+<p class="meta"><code>main</code> · worktree <code>/Users/anishthite/workspace/poaster</code> · 2026-07-13 · status <b>ready-for-review</b> · blast <span class="blast-low">low</span></p>
+
+<h2>Summary</h2>
+<div class="kv">
+  <b>Goal</b><div>Add a local review UI for suggestion batches with source tweet context, draft text, approval/denial, and notes.</div>
+  <b>Source</b><div><code>data/suggestions/*.json</code> and first <code>evidenceUrls[]</code> entry per draft.</div>
+  <b>Surface</b><div><code>public/index.html</code>, <code>POST /api/reviews</code>, <code>GET /api/reviews</code>.</div>
+  <b>Schema</b><div>Write file-backed review JSON in <code>data/reviews/*-reviews.json</code>.</div>
+  <b>Tweet load</b><div>Use X's native <code>platform.twitter.com/widgets.js</code> embed; source link remains fallback.</div>
+  <b>Open Qs</b><div>0.</div>
+</div>
+
+<h2>API contract</h2>
+<pre>POST /api/reviews
+{ "suggestionFile": "2026-07-13-suggestions.json", "suggestionIndex": 0, "decision": "approve|deny", "note": "optional reason" }
+
+200
+{ "ok": true, "file": "2026-07-13-suggestions-reviews.json", "review": { "id": "...#0", "decision": "approve", "note": "..." } }
+
+GET /api/reviews?file=2026-07-13-suggestions.json
+200 { "file": "2026-07-13-suggestions-reviews.json", "reviews": [] }</pre>
+
+<h2>UI layout</h2>
+<ol>
+  <li>Render each latest suggestion as a review card.</li>
+  <li>Place source tweet embed above the suggested reply/post.</li>
+  <li>Save <code>Approve</code>/<code>Deny</code> plus the freeform reason through the local server.</li>
+</ol>
+
+<h2>Files</h2>
+<table>
+  <tr><th>Path</th><th>Kind</th><th>Delta</th></tr>
+  <tr><td><code>twitter-daily/scripts/render.mjs</code></td><td>touch</td><td>Render review cards, tweet embeds, and client-side review save/load logic.</td></tr>
+  <tr><td><code>twitter-daily/scripts/server.mjs</code></td><td>touch</td><td>Add review read/write endpoints and pass review data to future workflows.</td></tr>
+  <tr><td><code>twitter-daily/prompts/daily-twitter.md</code></td><td>touch</td><td>Treat saved review decisions as preference signal for guidance and suggestions.</td></tr>
+  <tr><td><code>twitter-daily/tests/render.test.mjs</code></td><td>touch</td><td>Assert review UI and prompt contract are rendered.</td></tr>
+  <tr><td><code>implementation-notes/INDEX.html</code></td><td>touch</td><td>Add this note row.</td></tr>
+</table>
+
+<h2>Decisions</h2>
+<table>
+  <tr><th>ID</th><th>Choice · Rationale</th></tr>
+  <tr><td>D-001</td><td>Save reviews as JSON files. Existing app is file-backed and needs no database.</td></tr>
+  <tr><td>D-002</td><td>Upsert by <code>suggestionFile#suggestionIndex</code>. Re-reviewing a draft should replace stale notes.</td></tr>
+  <tr><td>D-003</td><td>Use X native embeds. It is the smallest source-card loader and degrades to a link.</td></tr>
+</table>
+
+<h2>Tradeoffs</h2>
+<table>
+  <tr><th>ID</th><th>Picked over Rejected · Reason</th></tr>
+  <tr><td>T-001</td><td>Latest batch review over historical queue. The newest suggestions are the immediate workflow.</td></tr>
+</table>
+
+<h2>Assumptions</h2>
+<ul>
+  <li>A-001 · Local server is used for saving feedback. If wrong: cards still render, but buttons cannot write files from a static file URL.</li>
+</ul>
+
+<h2>Reversibility</h2>
+<p>R-001 · <span class="blast-low">low</span>. Revert touched Twitter Daily files and delete <code>data/reviews</code> if feedback should be discarded.</p>
+
+<h2>Definition of done</h2>
+<ul>
+  <li>Latest suggestions show source tweet context and draft text in review cards.</li>
+  <li>Approve/deny plus reason persists into <code>data/reviews</code>.</li>
+  <li>Future guidance/suggestion prompts mention review data.</li>
+  <li><code>cd twitter-daily && npm run check</code> passes.</li>
+  <li><code>POST /api/reviews</code> temp-root smoke saves and reads one approval.</li>
+</ul>
+</body>
+</html>

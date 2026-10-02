@@ -1,0 +1,12 @@
+# Private scraped data and run logs
+data/raw/*.json
+data/digests/*.json
+data/context/
+data/suggestions/
+data/state.json
+data/reviews/*.json
+public/digests/*.json
+public/digests/index.json
+public/context/
+public/suggestions/
+.runs/

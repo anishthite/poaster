@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="520" viewBox="0 0 1200 520" role="img" aria-labelledby="title desc">
+  <title id="title">Poaster buyer-friendly system flow</title>
+  <desc id="desc">A simple flow showing how Poaster turns social signals into approved posts.</desc>
+  <defs>
+    <style>
+      .bg { fill: #0f172a; }
+      .card { fill: #111827; stroke: #334155; stroke-width: 2; rx: 24; }
+      .accent { fill: #38bdf8; }
+      .text { fill: #f8fafc; font: 700 28px Inter, Arial, sans-serif; }
+      .small { fill: #cbd5e1; font: 18px Inter, Arial, sans-serif; }
+      .arrow { stroke: #38bdf8; stroke-width: 5; fill: none; marker-end: url(#arrow); }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#38bdf8"/>
+    </marker>
+  </defs>
+  <rect class="bg" width="1200" height="520"/>
+  <text x="60" y="70" class="text">Poaster, sold simply</text>
+  <text x="60" y="104" class="small">A private AI content engine: it finds ideas, drafts in your voice, and waits for your approval.</text>
+
+  <g transform="translate(60 170)">
+    <rect class="card" width="220" height="180" rx="24"/>
+    <circle class="accent" cx="44" cy="46" r="12"/>
+    <text x="28" y="92" class="text" font-size="24">Listen</text>
+    <text x="28" y="128" class="small">Reads your X world:</text>
+    <text x="28" y="154" class="small">posts, trends, replies.</text>
+  </g>
+
+  <path class="arrow" d="M 300 260 H 378"/>
+
+  <g transform="translate(400 170)">
+    <rect class="card" width="220" height="180" rx="24"/>
+    <circle class="accent" cx="44" cy="46" r="12"/>
+    <text x="28" y="92" class="text" font-size="24">Digest</text>
+    <text x="28" y="128" class="small">Turns noise into</text>
+    <text x="28" y="154" class="small">useful angles.</text>
+  </g>
+
+  <path class="arrow" d="M 640 260 H 718"/>
+
+  <g transform="translate(740 170)">
+    <rect class="card" width="220" height="180" rx="24"/>
+    <circle class="accent" cx="44" cy="46" r="12"/>
+    <text x="28" y="92" class="text" font-size="24">Draft</text>
+    <text x="28" y="128" class="small">Writes polished posts</text>
+    <text x="28" y="154" class="small">in your voice.</text>
+  </g>
+
+  <path class="arrow" d="M 980 260 H 1058"/>
+
+  <g transform="translate(980 170)">
+    <rect class="card" width="160" height="180" rx="24"/>
+    <circle class="accent" cx="44" cy="46" r="12"/>
+    <text x="28" y="92" class="text" font-size="24">Approve</text>
+    <text x="28" y="128" class="small">You review.</text>
+    <text x="28" y="154" class="small">Then post.</text>
+  </g>
+
+  <text x="60" y="430" class="small">Positioning: not “software”; a consistent posting system for busy founders, creators, and consultants.</text>
+  <text x="60" y="460" class="small">MVP offer: setup + weekly content packs + one-click approval. Add automation only after buyers ask.</text>
+</svg>

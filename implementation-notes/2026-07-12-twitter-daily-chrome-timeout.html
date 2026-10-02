@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Twitter Daily Chrome timeout</title>
+<meta name="task" content="Handle pi-chrome command timeouts in the Twitter Daily runner">
+<meta name="date-started" content="2026-07-12">
+<meta name="date-updated" content="2026-07-12">
+<meta name="status" content="shipped">
+<meta name="blast-radius" content="low">
+<meta name="tags" content="twitter-daily,pi-chrome,timeout,web">
+<meta name="related" content="implementation-notes/2026-07-12-twitter-daily-sdk-runner.html">
+<style>
+  body { font: 14px/1.45 -apple-system, system-ui, sans-serif; max-width: 880px; margin: 1.5rem auto; padding: 0 1rem; color: #111; }
+  h1 { font-size: 20px; margin: 0 0 .25rem; }
+  h2 { font-size: 15px; margin: 1.4rem 0 .4rem; border-bottom: 1px solid #ddd; padding-bottom: .2rem; }
+  table { border-collapse: collapse; width: 100%; margin: .4rem 0 .8rem; }
+  th, td { border: 1px solid #ddd; padding: 4px 8px; text-align: left; vertical-align: top; }
+  th { background: #f6f6f6; font-weight: 600; }
+  code { background: #f1f1f1; padding: 1px 4px; border-radius: 3px; font-size: 12.5px; }
+  .blast-low { color: #2a7a2a; }
+  .meta { color: #555; font-size: 12.5px; margin-bottom: .8rem; }
+  .kv { display: grid; grid-template-columns: 140px 1fr; gap: 2px 14px; font-size: 13px; margin: .4rem 0 1rem; }
+  .kv b { color: #444; font-weight: 600; }
+</style>
+</head>
+<body>
+<h1>Twitter Daily Chrome timeout</h1>
+<p class="meta"><code>main</code> · worktree <code>/Users/anishthite/workspace/poaster</code> · 2026-07-12 · status <b>shipped</b> · blast <span class="blast-low">low</span></p>
+
+<h2>Summary</h2>
+<div class="kv">
+  <b>Goal</b><div>Stop <code>chrome_tab action=list</code> timeout loops from becoming vague missing-digest errors.</div>
+  <b>Source</b><div><code>pi-chrome</code> local bridge and SDK tool events.</div>
+  <b>Surface</b><div><code>POST /api/run</code>, <code>GET /api/log</code>, daily prompt.</div>
+  <b>Schema</b><div>None.</div>
+  <b>Mobile</b><div>Untouched.</div>
+  <b>Open Qs</b><div>0.</div>
+</div>
+
+<h2>Files</h2>
+<table>
+  <tr><th>Path</th><th>Kind</th><th>Delta</th></tr>
+  <tr><td><code>twitter-daily/scripts/server.mjs</code></td><td>touch</td><td>Preflight <code>tab.version</code>, open the connector page on timeout, and preserve timeout errors.</td></tr>
+  <tr><td><code>twitter-daily/scripts/render.mjs</code></td><td>touch</td><td>Add an <code>Open connector reload</code> control.</td></tr>
+  <tr><td><code>twitter-daily/tests/render.test.mjs</code></td><td>touch</td><td>Assert connector control copy and <code>node --check scripts/server.mjs</code>.</td></tr>
+  <tr><td><code>implementation-notes/INDEX.html</code></td><td>touch</td><td>Add this note row.</td></tr>
+</table>
+
+<h2>Decisions</h2>
+<table>
+  <tr><th>ID</th><th>Choice · Rationale</th></tr>
+  <tr><td>D-001</td><td>Probe <code>tab.version</code> before scraping. A non-returning connector needs reload before any scrape can work.</td></tr>
+  <tr><td>D-002</td><td>Keep the SDK agent for scraping. Replacing it with a custom scraper is more code.</td></tr>
+</table>
+
+<h2>Tradeoffs</h2>
+<table>
+  <tr><th>ID</th><th>Picked over Rejected · Reason</th></tr>
+  <tr><td>T-001</td><td>Open <code>chrome://extensions</code> over UI automation. Reloading extensions is a user-owned browser operation.</td></tr>
+</table>
+
+<h2>Reversibility</h2>
+<p>R-001 · <span class="blast-low">low</span>. Revert <code>twitter-daily/scripts/server.mjs</code>, <code>twitter-daily/scripts/render.mjs</code>, <code>twitter-daily/tests/render.test.mjs</code>, and this note row.</p>
+
+<h2>Definition of done</h2>
+<ul>
+  <li><code>npm test</code> passes.</li>
+  <li>Server restarts.</li>
+  <li>Future timeout reports name the Chrome tool failure instead of only <code>No digest written</code>.</li>
+</ul>
+</body>
+</html>

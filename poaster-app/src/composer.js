@@ -7,9 +7,9 @@ const STARTER_AGENT_PROMPTS = [
 ];
 
 const DRAFT_AGENT_PROMPTS = [
-  'Critique the composer draft. Be blunt, then give a cleaner version.',
-  'Make the composer draft punchier without changing the point.',
-  'Give me 5 alternate hooks for the composer draft.',
+  'Critique the draft. Be blunt, then give a cleaner version.',
+  'Make the draft punchier without changing the point.',
+  'Give me 5 alternate hooks for the draft.',
 ];
 
 export function countTweetChars(text) {

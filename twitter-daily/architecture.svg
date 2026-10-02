@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="520" viewBox="0 0 1120 520" role="img" aria-labelledby="title desc">
+  <title id="title">Twitter Daily local pi-chrome architecture</title>
+  <desc id="desc">A local scheduler invokes Pi, Pi uses pi-chrome against the signed-in Chrome profile, writes local digest files, and renders a local static web app.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/>
+    </marker>
+    <style>
+      .box { fill: #f8fafc; stroke: #334155; stroke-width: 2; rx: 14; }
+      .soft { fill: #eff6ff; }
+      .store { fill: #f0fdf4; }
+      .warn { fill: #fff7ed; }
+      .title { font: 700 18px system-ui, -apple-system, sans-serif; fill: #0f172a; }
+      .text { font: 14px system-ui, -apple-system, sans-serif; fill: #334155; }
+      .small { font: 12px system-ui, -apple-system, sans-serif; fill: #64748b; }
+      .line { stroke: #334155; stroke-width: 2.2; fill: none; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <rect x="24" y="24" width="1072" height="472" fill="#ffffff" stroke="#e2e8f0"/>
+  <text x="48" y="62" class="title">twitter-daily/ — local daily X/Twitter learning digest</text>
+  <text x="48" y="86" class="small">Lazy v1: cron/launchd, Pi, pi-chrome, JSON files, static local page.</text>
+
+  <rect class="box soft" x="50" y="142" width="170" height="86"/>
+  <text x="84" y="176" class="title">Scheduler</text>
+  <text x="78" y="202" class="text">cron or launchd</text>
+
+  <rect class="box soft" x="282" y="122" width="212" height="126"/>
+  <text x="342" y="158" class="title">run-daily.sh</text>
+  <text x="316" y="186" class="text">creates run paths</text>
+  <text x="316" y="208" class="text">calls pi -p</text>
+  <text x="316" y="230" class="text">runs renderer</text>
+
+  <rect class="box warn" x="560" y="108" width="210" height="114"/>
+  <text x="628" y="144" class="title">Pi + pi-chrome</text>
+  <text x="596" y="172" class="text">authorized session</text>
+  <text x="596" y="194" class="text">scrape + distill</text>
+
+  <rect class="box warn" x="842" y="108" width="210" height="114"/>
+  <text x="884" y="144" class="title">Signed-in Chrome</text>
+  <text x="882" y="172" class="text">x.com tabs</text>
+  <text x="882" y="194" class="small">your real profile</text>
+
+  <rect class="box store" x="560" y="292" width="210" height="124"/>
+  <text x="622" y="328" class="title">Local files</text>
+  <text x="596" y="356" class="text">data/raw/*.json</text>
+  <text x="596" y="378" class="text">data/digests/*.json</text>
+  <text x="596" y="400" class="text">data/state.json</text>
+
+  <rect class="box" x="842" y="292" width="210" height="124"/>
+  <text x="902" y="328" class="title">Web app</text>
+  <text x="880" y="356" class="text">public/index.html</text>
+  <text x="880" y="378" class="text">127.0.0.1:8787</text>
+
+  <path class="line" d="M 220 185 H 272"/>
+  <path class="line" d="M 494 170 H 550"/>
+  <path class="line" d="M 770 164 H 832"/>
+  <path class="line" d="M 842 192 C 810 230, 798 232, 770 198"/>
+  <path class="line" d="M 665 222 V 282"/>
+  <path class="line" d="M 770 354 H 832"/>
+  <path class="line" d="M 388 248 C 408 354, 474 354, 550 354"/>
+
+  <text x="232" y="174" class="small">daily</text>
+  <text x="504" y="158" class="small">prompt</text>
+  <text x="782" y="152" class="small">chrome_* tools</text>
+  <text x="638" y="260" class="small">write outputs</text>
+  <text x="784" y="342" class="small">render</text>
+</svg>

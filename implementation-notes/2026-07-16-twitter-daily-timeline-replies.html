@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Twitter Daily timeline replies scrape</title>
+<meta name="task" content="Narrow Twitter Daily to home timeline tweets with first visible replies">
+<meta name="date-started" content="2026-07-16">
+<meta name="date-updated" content="2026-07-16">
+<meta name="status" content="shipped">
+<meta name="blast-radius" content="low">
+<meta name="tags" content="twitter-daily,timeline,replies,x-scrape,data-contract">
+<meta name="related" content="2026-07-13-twitter-daily-workflows.html,2026-07-13-twitter-daily-standalone-learning-steps.html">
+<style>
+  body { font: 14px/1.45 -apple-system, system-ui, sans-serif; max-width: 880px; margin: 1.5rem auto; padding: 0 1rem; color: #111; }
+  h1 { font-size: 20px; margin: 0 0 .25rem; }
+  h2 { font-size: 15px; margin: 1.4rem 0 .4rem; border-bottom: 1px solid #ddd; padding-bottom: .2rem; }
+  table { border-collapse: collapse; width: 100%; margin: .4rem 0 .8rem; }
+  th, td { border: 1px solid #ddd; padding: 4px 8px; text-align: left; vertical-align: top; }
+  th { background: #f6f6f6; font-weight: 600; }
+  code, pre { font-family: ui-monospace, Menlo, monospace; }
+  code { background: #f1f1f1; padding: 1px 4px; border-radius: 3px; font-size: 12.5px; }
+  pre { background: #f6f6f6; padding: .55rem .7rem; border-radius: 4px; overflow-x: auto; font-size: 12.5px; line-height: 1.4; }
+  ul, ol { margin: .3rem 0 .8rem 1.2rem; padding: 0; }
+  li { margin: .15rem 0; }
+  .blast-low { color: #2a7a2a; }
+  .meta { color: #555; font-size: 12.5px; margin-bottom: .8rem; }
+  .kv { display: grid; grid-template-columns: 140px 1fr; gap: 2px 14px; font-size: 13px; margin: .4rem 0 1rem; }
+  .kv b { color: #444; font-weight: 600; }
+</style>
+</head>
+<body>
+<h1>Twitter Daily timeline replies scrape</h1>
+<p class="meta"><code>main</code> · worktree <code>/Users/anishthite/workspace/poaster</code> · 2026-07-16 · status <b>shipped</b> · blast <span class="blast-low">low</span></p>
+
+<h2>Summary</h2>
+<div class="kv">
+  <b>Goal</b><div>Make the default run scrape home timeline tweets and up to <code>3</code> visible replies per tweet.</div>
+  <b>Source</b><div><code>x.com/home</code> via signed-in Chrome and background-safe <code>chrome_evaluate</code>.</div>
+  <b>Surface</b><div><code>twitter-daily/prompts/daily-twitter.md</code>, <code>scripts/server.mjs</code>, <code>scripts/cli.mjs</code>, <code>scripts/render.mjs</code>.</div>
+  <b>Schema</b><div>Add nested <code>items[].replies[]</code> while keeping top-level tweet fields stable.</div>
+  <b>Open Qs</b><div>0.</div>
+</div>
+
+<h2>Data contract</h2>
+<pre>{
+  id: string,
+  url: string,
+  author: string,
+  handle: string,
+  text: string,
+  createdAt: string,
+  metrics: { replies?: number, reposts?: number, likes?: number, views?: number },
+  media: [{ kind: "image" | "video" | "gif", alt?: string, url?: string }],
+  capturedAt: string,
+  replies: [{
+    id: string,
+    url: string,
+    author: string,
+    handle: string,
+    text: string,
+    createdAt: string,
+    metrics: { replies?: number, reposts?: number, likes?: number, views?: number },
+    capturedAt: string
+  }]
+}</pre>
+
+<h2>Algorithm</h2>
+<ol>
+  <li>Read visible home timeline <code>article</code> nodes; keep stable tweet URLs and visible text/metrics.</li>
+  <li>Open each kept tweet URL; read the conversation page; store first <code>3</code> visible replies after the original.</li>
+  <li>Scroll the home timeline with <code>window.scrollBy</code>; stop at <code>20</code> timeline tweets or <code>10</code> minutes.</li>
+  <li>Write raw JSON with nested replies; distill from timeline tweets plus replies without inventing missing metrics.</li>
+</ol>
+
+<h2>Files</h2>
+<table>
+  <tr><th>Path</th><th>Kind</th><th>Delta</th></tr>
+  <tr><td><code>twitter-daily/prompts/daily-twitter.md</code></td><td>touch</td><td>Set the timeline scrape contract and reply cap.</td></tr>
+  <tr><td><code>twitter-daily/scripts/server.mjs</code></td><td>touch</td><td>Make the primary workflow a timeline-plus-replies scrape.</td></tr>
+  <tr><td><code>twitter-daily/scripts/cli.mjs</code></td><td>touch</td><td>Default manual runs to <code>home-timeline-with-replies</code>.</td></tr>
+  <tr><td><code>twitter-daily/scripts/render.mjs</code></td><td>touch</td><td>Name the simplified workflow in history/status.</td></tr>
+  <tr><td><code>twitter-daily/tests/render.test.mjs</code></td><td>touch</td><td>Assert the prompt keeps the nested reply contract.</td></tr>
+</table>
+
+<h2>Decisions</h2>
+<table>
+  <tr><th>ID</th><th>Choice · Rationale</th></tr>
+  <tr><td>D-001</td><td>Use nested <code>items[].replies[]</code>. It keeps replies attached to the tweet they explain.</td></tr>
+  <tr><td>D-002</td><td>Cap timeline tweets at <code>20</code>. Opening replies for every tweet makes <code>40</code> too slow.</td></tr>
+</table>
+
+<h2>Tradeoffs</h2>
+<table>
+  <tr><th>ID</th><th>Picked over Rejected · Reason</th></tr>
+  <tr><td>T-001</td><td>Prompt contract over a new scraper module. The current runner already delegates Chrome extraction to Pi.</td></tr>
+  <tr><td>T-002</td><td>First visible replies over sorted top replies. X does not expose a stable reply sort control through the DOM.</td></tr>
+</table>
+
+<h2>Assumptions</h2>
+<ul>
+  <li>A-001 · The first visible replies on the tweet page are useful enough for v1; if wrong, add a reply ranking pass.</li>
+</ul>
+
+<h2>Reversibility</h2>
+<p>R-001 · <span class="blast-low">low</span>. Revert prompt/UI/test edits; saved raw JSON remains readable because nested <code>replies</code> is additive.</p>
+
+<h2>Followups</h2>
+<ul>
+  <li>L-001 · Add a real DOM scraper only after prompt-driven extraction fails repeatedly.</li>
+</ul>
+
+<h2>Definition of done</h2>
+<ul>
+  <li>Default runner labels and prompt describe timeline tweets plus first <code>3</code> replies.</li>
+  <li>Raw JSON contract lists every stored tweet and reply field.</li>
+  <li><code>cd twitter-daily &amp;&amp; npm test</code> passes.</li>
+</ul>
+</body>
+</html>

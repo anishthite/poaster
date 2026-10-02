@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Twitter Daily plan</title>
+<meta name="task" content="Plan a daily Twitter/X learning digest app in a new subfolder">
+<meta name="date-started" content="2026-07-09">
+<meta name="date-updated" content="2026-07-09">
+<meta name="status" content="blocked">
+<meta name="blast-radius" content="low">
+<meta name="tags" content="twitter,x,cron,local,pi-chrome,digest,plan">
+<meta name="related" content="implementation-notes/2026-07-08-poaster-tweet-guidance-image.html">
+<style>
+  body { font: 14px/1.45 -apple-system, system-ui, sans-serif; max-width: 880px; margin: 1.5rem auto; padding: 0 1rem; color: #111; }
+  h1 { font-size: 20px; margin: 0 0 .25rem; }
+  h2 { font-size: 15px; margin: 1.4rem 0 .4rem; border-bottom: 1px solid #ddd; padding-bottom: .2rem; }
+  table { border-collapse: collapse; width: 100%; margin: .4rem 0 .8rem; }
+  th, td { border: 1px solid #ddd; padding: 4px 8px; text-align: left; vertical-align: top; }
+  th { background: #f6f6f6; font-weight: 600; }
+  code, pre { font-family: ui-monospace, Menlo, monospace; }
+  code { background: #f1f1f1; padding: 1px 4px; border-radius: 3px; font-size: 12.5px; }
+  pre { background: #f6f6f6; padding: .55rem .7rem; border-radius: 4px; overflow-x: auto; font-size: 12.5px; line-height: 1.4; }
+  ul, ol { margin: .3rem 0 .8rem 1.2rem; padding: 0; }
+  li { margin: .15rem 0; }
+  .q { border-left: 3px solid #b85c00; background: #fff8ee; padding: .4rem .7rem; margin: .4rem 0; }
+  .q .id { color: #b85c00; font-weight: 700; }
+  .q.resolved { border-left-color: #2a7a2a; background: #f1faf1; }
+  .q.resolved .id { color: #2a7a2a; }
+  .blast-low { color: #2a7a2a; }
+  .meta { color: #555; font-size: 12.5px; margin-bottom: .8rem; }
+  .kv { display: grid; grid-template-columns: 140px 1fr; gap: 2px 14px; font-size: 13px; margin: .4rem 0 1rem; }
+  .kv b { color: #444; font-weight: 600; }
+</style>
+</head>
+<body>
+<h1>Twitter Daily plan</h1>
+<p class="meta"><code>main</code> · worktree <code>/Users/anishthite/workspace/poaster</code> · 2026-07-09 · status <b>blocked</b> · blast <span class="blast-low">low</span></p>
+
+<h2>Summary</h2>
+<div class="kv">
+  <b>Goal</b><div>Scaffold a local daily personal X/Twitter learning digest app.</div>
+  <b>Source</b><div><code>pi-chrome</code> against signed-in local Chrome X tabs.</div>
+  <b>Surface</b><div><code>cron</code>/<code>launchd</code>, <code>bin/run-daily.sh</code>, <code>public/index.html</code>.</div>
+  <b>Schema</b><div>Local JSON files: <code>raw</code>, <code>digests</code>, <code>state.json</code>.</div>
+  <b>Mobile</b><div>Local static page; responsive CSS in implementation.</div>
+  <b>Open Qs</b><div>2 (<code>Q-004</code>, <code>Q-005</code>).</div>
+</div>
+
+<h2>Algorithm</h2>
+<ol>
+  <li>Run local scheduler.</li>
+  <li>Invoke <code>pi -p</code> with the fixed daily prompt.</li>
+  <li>Use <code>pi-chrome</code> to read bounded X surfaces.</li>
+  <li>Write <code>data/raw/YYYY-MM-DD.json</code> and <code>data/digests/YYYY-MM-DD.json</code>.</li>
+  <li>Render <code>public/index.html</code> for local viewing.</li>
+</ol>
+
+<h2>UI layout</h2>
+<ol>
+  <li><b>Controls</b>: open Chrome auth, run daily scrape, and refresh status.</li>
+  <li><b>Header</b>: latest digest day and source counts.</li>
+  <li><b>Digest</b>: markdown bullets for topics, lessons, and follow-up ideas.</li>
+  <li><b>History</b>: previous day links.</li>
+</ol>
+
+<h2>Files</h2>
+<table>
+  <tr><th>Path</th><th>Kind</th><th>Delta</th></tr>
+  <tr><td><code>twitter-daily/PLAN.md</code></td><td>new</td><td>Record MVP shape, schema, milestones, and explicit skips.</td></tr>
+  <tr><td><code>twitter-daily/architecture.svg</code></td><td>new</td><td>Show scheduler, Pi, <code>pi-chrome</code>, signed-in Chrome, local files, and web app flow.</td></tr>
+  <tr><td><code>implementation-notes/INDEX.html</code></td><td>touch</td><td>Add this plan row.</td></tr>
+  <tr><td><code>twitter-daily/package.json</code></td><td>new</td><td>Add local scripts for run, render, serve, test, and check.</td></tr>
+  <tr><td><code>twitter-daily/.gitignore</code></td><td>new</td><td>Exclude private scraped data and run logs.</td></tr>
+  <tr><td><code>twitter-daily/bin/run-daily.sh</code></td><td>new</td><td>Run Pi, require digest output, and render the app.</td></tr>
+  <tr><td><code>twitter-daily/prompts/daily-twitter.md</code></td><td>new</td><td>Constrain <code>pi-chrome</code> scraping and JSON outputs.</td></tr>
+  <tr><td><code>twitter-daily/scripts/run-pi.mjs</code></td><td>new</td><td>Invoke <code>pi -p</code> with timeout and auth-blocker detection.</td></tr>
+  <tr><td><code>twitter-daily/scripts/render.mjs</code></td><td>new</td><td>Render digest JSON into the local static web app with control buttons.</td></tr>
+  <tr><td><code>twitter-daily/scripts/server.mjs</code></td><td>new</td><td>Serve the local app and guarded auth/run endpoints.</td></tr>
+  <tr><td><code>twitter-daily/tests/render.test.mjs</code></td><td>new</td><td>Check digest ordering and HTML escaping.</td></tr>
+  <tr><td><code>twitter-daily/public/index.html</code></td><td>new</td><td>Generated empty-state local app shell.</td></tr>
+  <tr><td><code>twitter-daily/CHROME_AUTH.md</code></td><td>new</td><td>Document long-lived <code>pi-chrome</code> authorization and cron caveat.</td></tr>
+  <tr><td><code>twitter-daily/bin/open-authorized-pi.sh</code></td><td>new</td><td>Open a named Pi session with auth instructions.</td></tr>
+</table>
+
+<h2>Decisions</h2>
+<table>
+  <tr><th>ID</th><th>Choice · Rationale</th></tr>
+  <tr><td>D-001</td><td>Use <code>twitter-daily/</code>. Keeps the digest app separate from <code>poaster-app/</code>.</td></tr>
+  <tr><td>D-002</td><td>Prefer official API/export. Cookie scraping is brittle and credential-risky.</td></tr>
+  <tr><td>D-003</td><td>Use one Cloudflare Worker. Existing repo already deploys Workers.</td></tr>
+  <tr><td>D-004</td><td>Use <code>D1</code>. Queryable history costs little.</td></tr>
+  <tr><td>D-005</td><td>Serve HTML from the Worker. React is not needed for a one-page digest.</td></tr>
+  <tr><td>D-006</td><td>Use local scheduler plus Pi. Supersedes <code>D-003</code> because the app must use <code>pi-chrome</code>.</td></tr>
+  <tr><td>D-007</td><td>Use JSON files. Supersedes <code>D-004</code> because local single-user history does not need a database.</td></tr>
+  <tr><td>D-008</td><td>Serve static local HTML. Supersedes <code>D-005</code> because no Worker runs in v1.</td></tr>
+  <tr><td>D-009</td><td>Use <code>pi-chrome</code> over API/export. Supersedes <code>D-002</code> per user requirement.</td></tr>
+  <tr><td>D-010</td><td>Wrap <code>pi -p</code> in <code>scripts/run-pi.mjs</code>. Prevents silent no-output hangs from becoming endless cron runs.</td></tr>
+  <tr><td>D-011</td><td>Ignore generated data. Raw X data stays out of git.</td></tr>
+  <tr><td>D-012</td><td>Add <code>npm run auth</code>. Makes the safe long-term authorization path one command.</td></tr>
+  <tr><td>D-013</td><td>Add a local server. Lets the web app open authorization and run the job without browser-side shell access.</td></tr>
+  <tr><td>D-014</td><td>Require an in-memory header token for control endpoints. Blocks cross-origin form posts from triggering local actions.</td></tr>
+  <tr><td>D-015</td><td>Parse generated inline script in tests. Catches escaped newline bugs before the controls freeze.</td></tr>
+</table>
+
+<h2>Tradeoffs</h2>
+<table>
+  <tr><th>ID</th><th>Picked over Rejected · Reason</th></tr>
+  <tr><td>T-001</td><td><code>D1</code> over <code>KV</code>. History queries need rows, not blobs.</td></tr>
+  <tr><td>T-002</td><td>Stub digest before <code>LLM</code>. Ingestion should fail independently from summarization.</td></tr>
+  <tr><td>T-003</td><td>Local files over <code>D1</code>. Plain files are enough for one daily local run.</td></tr>
+  <tr><td>T-004</td><td><code>pi-chrome</code> over <code>X API</code>. Signed-in browser access is the requested source.</td></tr>
+  <tr><td>T-005</td><td>Static HTML over app framework. One digest page does not need React.</td></tr>
+  <tr><td>T-006</td><td>Auth-launch button over bypassing <code>pi-chrome</code>. Keeps the explicit confirmation gate intact.</td></tr>
+</table>
+
+<h2>Open questions</h2>
+<div class="q resolved"><span class="id">Q-001</span> · Source credentials. <b>RESOLVED 2026-07-09: use <code>pi-chrome</code>.</b></div>
+<div class="q resolved"><span class="id">Q-002</span> · Privacy gate. <b>RESOLVED 2026-07-09: local-only v1.</b></div>
+<div class="q resolved"><span class="id">Q-003</span> · Model provider. <b>RESOLVED 2026-07-09: use the Pi run's model.</b></div>
+<div class="q"><span class="id">Q-004</span> · Unattended Chrome authorization. <b>Assumed: cron can invoke an authorized Pi session.</b> Alternatives: long-lived authorized session, manual daily run.</div>
+<div class="q"><span class="id">Q-005</span> · X source surface. <b>Assumed: profile plus replies first.</b> Alternatives: bookmarks, likes, home timeline, notifications.</div>
+<div class="q"><span class="id">Q-006</span> · First real run. <b>Blocked: current Pi/Chrome session needs <code>/chrome authorize indefinite</code>.</b> Alternatives: authorize session, run manually from an authorized Pi session.</div>
+
+<h2>Assumptions</h2>
+<ul>
+  <li>A-001 · The app is single-user. If wrong: add auth and account scoping.</li>
+  <li>A-002 · Daily volume fits one local Pi/browser run. If wrong: cap scroll depth harder.</li>
+  <li>A-003 · Raw/digest data is private. If wrong: remove generated JSON from <code>.gitignore</code>.</li>
+</ul>
+
+<h2>Reversibility</h2>
+<p>R-001 · <span class="blast-low">low</span>. Delete <code>twitter-daily/</code> and this note row to revert the plan artifacts.</p>
+<p>R-002 · <span class="blast-low">low</span>. Revert the local plan by restoring the prior Cloudflare/D1 plan text.</p>
+
+<h2>Followups</h2>
+<ul>
+  <li>L-001 · Scaffold local files after source surface and authorization mode are chosen.</li>
+  <li>L-002 · Run <code>/chrome authorize</code>, rerun <code>cd twitter-daily &amp;&amp; ./bin/run-daily.sh</code>, and inspect the generated digest.</li>
+</ul>
+
+<h2>Definition of done</h2>
+<ul>
+  <li><code>twitter-daily/PLAN.md</code> exists.</li>
+  <li><code>twitter-daily/architecture.svg</code> exists.</li>
+  <li>Plan names explicit skips and open questions.</li>
+  <li><code>npm test</code> passes.</li>
+  <li>Real run writes <code>data/digests/YYYY-MM-DD.json</code>.</li>
+</ul>
+</body>
+</html>

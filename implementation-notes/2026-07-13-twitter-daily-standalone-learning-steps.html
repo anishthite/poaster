@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Twitter Daily standalone learning steps</title>
+<meta name="task" content="Expose standalone tweet and reply learning steps">
+<meta name="date-started" content="2026-07-13">
+<meta name="date-updated" content="2026-07-13">
+<meta name="status" content="ready-for-review">
+<meta name="blast-radius" content="low">
+<meta name="tags" content="twitter-daily,learning,standalone,replies,web">
+<meta name="related" content="implementation-notes/2026-07-13-twitter-daily-two-learning-flows.html">
+<style>
+  body { font: 14px/1.45 -apple-system, system-ui, sans-serif; max-width: 880px; margin: 1.5rem auto; padding: 0 1rem; color: #111; }
+  h1 { font-size: 20px; margin: 0 0 .25rem; }
+  h2 { font-size: 15px; margin: 1.4rem 0 .4rem; border-bottom: 1px solid #ddd; padding-bottom: .2rem; }
+  table { border-collapse: collapse; width: 100%; margin: .4rem 0 .8rem; }
+  th, td { border: 1px solid #ddd; padding: 4px 8px; text-align: left; vertical-align: top; }
+  th { background: #f6f6f6; font-weight: 600; }
+  code, pre { font-family: ui-monospace, Menlo, monospace; }
+  code { background: #f1f1f1; padding: 1px 4px; border-radius: 3px; font-size: 12.5px; }
+  ul, ol { margin: .3rem 0 .8rem 1.2rem; padding: 0; }
+  li { margin: .15rem 0; }
+  .blast-low { color: #2a7a2a; }
+  .meta { color: #555; font-size: 12.5px; margin-bottom: .8rem; }
+  .kv { display: grid; grid-template-columns: 140px 1fr; gap: 2px 14px; font-size: 13px; margin: .4rem 0 1rem; }
+  .kv b { color: #444; font-weight: 600; }
+</style>
+</head>
+<body>
+<h1>Twitter Daily standalone learning steps</h1>
+<p class="meta"><code>main</code> · worktree <code>/Users/anishthite/workspace/poaster</code> · 2026-07-13 · status <b>ready-for-review</b> · blast <span class="blast-low">low</span></p>
+
+<h2>Summary</h2>
+<div class="kv">
+  <b>Goal</b><div>Let each learning stage run standalone, and make reply learning inspect home feed conversations automatically.</div>
+  <b>Source</b><div>User asked for per-part runs and automatic home-feed reply learning with visible metrics.</div>
+  <b>Surface</b><div><code>public/index.html</code>, <code>POST /api/run</code>, prompt contract.</div>
+  <b>Schema</b><div>Add workflow names only; continue file-backed JSON.</div>
+  <b>Reply scrape</b><div>Open candidate home tweets, collect original tweets plus visible replies and metrics.</div>
+  <b>Open Qs</b><div>0.</div>
+</div>
+
+<h2>API contract</h2>
+<pre>POST /api/run { "workflow": "home-tweets" }
+POST /api/run { "workflow": "own-tweets" }
+POST /api/run { "workflow": "tweet-guidance" }
+POST /api/run { "workflow": "reply-scan" }
+POST /api/run { "workflow": "reply-guidance" }</pre>
+
+<h2>UI layout</h2>
+<ol>
+  <li>Keep <code>Learn good tweets</code> and <code>Learn good replies</code> as one-click combined runs.</li>
+  <li>Add standalone buttons for home scan, own scan, tweet guidance, reply scan, and reply guidance.</li>
+</ol>
+
+<h2>Files</h2>
+<table>
+  <tr><th>Path</th><th>Kind</th><th>Delta</th></tr>
+  <tr><td><code>twitter-daily/scripts/server.mjs</code></td><td>touch</td><td>Add standalone workflow keys and remove URL requirement from reply learning.</td></tr>
+  <tr><td><code>twitter-daily/scripts/render.mjs</code></td><td>touch</td><td>Render combined and standalone learning controls.</td></tr>
+  <tr><td><code>twitter-daily/prompts/daily-twitter.md</code></td><td>touch</td><td>Define standalone workflow behavior and home-feed reply scrape rules.</td></tr>
+  <tr><td><code>twitter-daily/tests/render.test.mjs</code></td><td>touch</td><td>Assert new controls and prompt contract.</td></tr>
+  <tr><td><code>implementation-notes/INDEX.html</code></td><td>touch</td><td>Add this note row.</td></tr>
+</table>
+
+<h2>Decisions</h2>
+<table>
+  <tr><th>ID</th><th>Choice · Rationale</th></tr>
+  <tr><td>D-001</td><td>Keep combined buttons. They are the lazy default for normal use.</td></tr>
+  <tr><td>D-002</td><td>Make reply learning home-feed based. Good reply rules need multiple live conversations, not one pasted URL.</td></tr>
+</table>
+
+<h2>Reversibility</h2>
+<p>R-001 · <span class="blast-low">low</span>. Revert touched Twitter Daily files and remove this note row.</p>
+
+<h2>Definition of done</h2>
+<ul>
+  <li>UI exposes combined and standalone runs.</li>
+  <li>Reply flow requires no URL and prompts home-feed tweet/reply/metric collection.</li>
+  <li><code>cd twitter-daily && npm run check</code> passes.</li>
+  <li><code>GET /api/status</code> shows <code>tweet-learnings,home-tweets,own-tweets,tweet-guidance,reply-learnings,reply-scan,reply-guidance</code>.</li>
+</ul>
+</body>
+</html>

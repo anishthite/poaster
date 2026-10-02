@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Poaster editable preview</title><meta name="task" content="Make the tweet preview directly editable"><meta name="date-started" content="2026-07-08"><meta name="status" content="shipped"><meta name="blast-radius" content="low"><meta name="tags" content="poaster,react,ui,tweet-preview,composer"><meta name="related" content="implementation-notes/2026-07-08-poaster-remove-tweet-url-input.html, implementation-notes/2026-07-08-poaster-real-timeline-polish.html"></head><body>
+<h1>Poaster editable preview</h1>
+<p class="meta">branch: main · worktree: /Users/anishthite/workspace/poaster · date: 2026-07-08 · status: shipped · blast: low</p>
+<h2>Summary</h2>
+<table><tbody>
+<tr><th>Goal</th><td>Remove the separate composer textarea and make the tweet preview card the draft input.</td></tr>
+<tr><th>Source</th><td>User asked whether the composer view is needed and requested typing directly in preview.</td></tr>
+<tr><th>Surface</th><td><code>poaster-app/src/App.jsx</code>, <code>poaster-app/src/composer.js</code>.</td></tr>
+<tr><th>Schema</th><td>None.</td></tr>
+<tr><th>Open Qs</th><td>0.</td></tr>
+</tbody></table>
+<h2>UI layout</h2>
+<ol><li><code>DraftTweetCard</code> owns the visible editable tweet text area.</li><li>Post action and character count stay next to the card.</li><li>Assistant still receives the current draft automatically.</li></ol>
+<h2>Files</h2>
+<table><thead><tr><th>Path</th><th>Kind</th><th>Delta</th></tr></thead><tbody>
+<tr><td><code>poaster-app/src/App.jsx</code></td><td>touch</td><td>Replace duplicate composer plus preview sections with one editable preview card.</td></tr>
+<tr><td><code>poaster-app/src/composer.js</code></td><td>touch</td><td>Rename visible assistant prompt chips from composer draft to draft.</td></tr>
+</tbody></table>
+<h2>Decisions</h2>
+<table><thead><tr><th>ID</th><th>Choice · Rationale</th></tr></thead><tbody>
+<tr><td>D-001</td><td>Use a styled <code>Textarea</code> inside the preview card. Native editing and accessibility beat <code>contenteditable</code> glue.</td></tr>
+</tbody></table>
+<h2>Tradeoffs</h2>
+<table><thead><tr><th>ID</th><th>Picked over Rejected</th><th>Reason</th></tr></thead><tbody>
+<tr><td>T-001</td><td>One editable card over synced composer and preview.</td><td>One source of truth removes the preview button and duplicate typing surface.</td></tr>
+</tbody></table>
+<h2>Reversibility</h2>
+<p>R-001: Low blast; restore the removed composer section and pass its draft into the preview card.</p>
+<h2>Definition of done</h2>
+<ul><li>No separate composer textarea appears above the preview.</li><li>Typing inside the tweet card updates post intent and assistant context.</li><li><code>cd poaster-app && npm run check</code> passes.</li></ul>
+</body></html>

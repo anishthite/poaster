@@ -18,7 +18,8 @@ const thinkingLevel = normalizeThinkingLevel(process.env.PI_THINKING_LEVEL) || '
 const sessionName = safeFileName(process.env.POASTER_AGENT_SESSION_ID || 'poaster');
 const sessionFile = `${sessionDir.replace(/\/$/, '')}/${sessionName}.jsonl`;
 const runtimeDir = dirname(fileURLToPath(import.meta.url));
-const tweetGuidance = readTweetGuidance();
+const tweetGuidance = readGuidance('tweet-guidance.md');
+const replyGuidance = readGuidance('reply-guidance.md');
 const model = getModel(providerId, modelId);
 if (!model) throw new Error(`Model not found in pi-ai catalog: ${providerId}/${modelId}`);
 
@@ -60,6 +61,7 @@ try {
     'Help the user improve posts, generate alternatives, or inspect/edit files when asked.',
     'Prefer concise, concrete output. Do not mention the runtime provider unless asked. Do not claim a post was published unless the user provides a real tweet URL.',
     tweetGuidance ? `Tweet-writing guidance:\n${tweetGuidance}` : '',
+    replyGuidance ? `Reply-writing guidance:\n${replyGuidance}` : '',
     '',
     prompt,
   ].join('\n'));
@@ -77,8 +79,8 @@ function normalizeThinkingLevel(value) {
   return ['off', 'minimal', 'low', 'medium', 'high', 'xhigh'].includes(value || '') ? value : undefined;
 }
 
-function readTweetGuidance() {
-  const path = join(runtimeDir, 'tweet-guidance.md');
+function readGuidance(file) {
+  const path = join(runtimeDir, file);
   return existsSync(path) ? readFileSync(path, 'utf8').trim() : '';
 }
 

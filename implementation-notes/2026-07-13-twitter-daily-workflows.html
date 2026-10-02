@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Twitter Daily workflow controls</title>
+<meta name="task" content="Add web-controlled Twitter learning workflows for own posts, timeline, and LLM context packs">
+<meta name="date-started" content="2026-07-13">
+<meta name="date-updated" content="2026-07-13">
+<meta name="status" content="ready-for-review">
+<meta name="blast-radius" content="low">
+<meta name="tags" content="twitter-daily,web,workflow,timeline,context">
+<meta name="related" content="implementation-notes/2026-07-13-twitter-daily-background-scroll.html, implementation-notes/2026-07-12-twitter-daily-sdk-runner.html, implementation-notes/2026-07-09-twitter-daily-plan.html">
+<style>
+  body { font: 14px/1.45 -apple-system, system-ui, sans-serif; max-width: 880px; margin: 1.5rem auto; padding: 0 1rem; color: #111; }
+  h1 { font-size: 20px; margin: 0 0 .25rem; }
+  h2 { font-size: 15px; margin: 1.4rem 0 .4rem; border-bottom: 1px solid #ddd; padding-bottom: .2rem; }
+  table { border-collapse: collapse; width: 100%; margin: .4rem 0 .8rem; }
+  th, td { border: 1px solid #ddd; padding: 4px 8px; text-align: left; vertical-align: top; }
+  th { background: #f6f6f6; font-weight: 600; }
+  code { background: #f1f1f1; padding: 1px 4px; border-radius: 3px; font-size: 12.5px; }
+  .blast-low { color: #2a7a2a; }
+  .meta { color: #555; font-size: 12.5px; margin-bottom: .8rem; }
+  .kv { display: grid; grid-template-columns: 140px 1fr; gap: 2px 14px; font-size: 13px; margin: .4rem 0 1rem; }
+  .kv b { color: #444; font-weight: 600; }
+</style>
+</head>
+<body>
+<h1>Twitter Daily workflow controls</h1>
+<p class="meta"><code>main</code> · worktree <code>/Users/anishthite/workspace/poaster</code> · 2026-07-13 · status <b>ready-for-review</b> · blast <span class="blast-low">low</span></p>
+
+<h2>Summary</h2>
+<div class="kv">
+  <b>Goal</b><div>Run own-post, timeline, and context-pack workflows from the web app.</div>
+  <b>Source</b><div>User wants understanding of tweets, what works, timeline lessons, and LLM-usable distilled output.</div>
+  <b>Surface</b><div><code>POST /api/run</code>, web controls, prompt contract, rendered digest list.</div>
+  <b>Schema</b><div>Additive <code>workflow</code>, <code>label</code>, and optional <code>contextFile</code> fields.</div>
+  <b>Open Qs</b><div>0.</div>
+</div>
+
+<h2>API contract</h2>
+<pre>POST /api/run
+{ "workflow": "own" | "timeline" | "context" }
+
+202 Accepted
+{ "ok": true, "running": { "workflow": "own" }, "message": "Started ..." }</pre>
+
+<h2>UI layout</h2>
+<ol>
+  <li>Keep existing auth/status/log controls.</li>
+  <li>Add one button per workflow with short descriptions.</li>
+  <li>Show latest context pack path when present.</li>
+</ol>
+
+<h2>Files</h2>
+<table>
+  <tr><th>Path</th><th>Kind</th><th>Delta</th></tr>
+  <tr><td><code>twitter-daily/prompts/daily-twitter.md</code></td><td>touch</td><td>Teach the agent <code>home-timeline</code>, <code>context-pack</code>, and small visible-article DOM reads.</td></tr>
+  <tr><td><code>twitter-daily/scripts/server.mjs</code></td><td>touch</td><td>Accept a <code>workflow</code> body field, route workflow outputs, and retry DOM timeouts once.</td></tr>
+  <tr><td><code>twitter-daily/scripts/render.mjs</code></td><td>touch</td><td>Render workflow buttons and context-pack status.</td></tr>
+  <tr><td><code>twitter-daily/tests/render.test.mjs</code></td><td>touch</td><td>Assert workflow controls and prompt coverage.</td></tr>
+  <tr><td><code>twitter-daily/scripts/cli.mjs</code></td><td>touch</td><td>Keep guided CLI prompts aligned with the workflow contract.</td></tr>
+  <tr><td><code>twitter-daily/scripts/run-pi.mjs</code></td><td>touch</td><td>Keep headless Pi prompts aligned with the workflow contract.</td></tr>
+  <tr><td><code>twitter-daily/bin/run-daily.sh</code></td><td>touch</td><td>Create context output directories for legacy runs.</td></tr>
+  <tr><td><code>implementation-notes/INDEX.html</code></td><td>touch</td><td>Add this note row.</td></tr>
+</table>
+
+<h2>Decisions</h2>
+<table>
+  <tr><th>ID</th><th>Choice · Rationale</th></tr>
+  <tr><td>D-001</td><td>Use three fixed workflows. The user named three jobs; a generic workflow builder is dead weight.</td></tr>
+  <tr><td>D-002</td><td>Keep the current <code>/api/run</code> endpoint. One optional field avoids new route plumbing.</td></tr>
+  <tr><td>D-003</td><td>Write context packs under <code>data/context/</code>. They are input for later LLM runs, not daily digests.</td></tr>
+  <tr><td>D-004</td><td>Retry <code>chrome_evaluate</code> timeouts with smaller visible-article reads. X can stall CDP on heavy page evaluation.</td></tr>
+</table>
+
+<h2>Tradeoffs</h2>
+<table>
+  <tr><th>ID</th><th>Picked over Rejected · Reason</th></tr>
+  <tr><td>T-001</td><td>Separate workflow buttons over one multi-step mega-run. Partial runs are easier to retry after Chrome flakes.</td></tr>
+  <tr><td>T-002</td><td>One automatic retry over disabling background mode. The retry keeps Chrome from stealing focus.</td></tr>
+</table>
+
+<h2>Reversibility</h2>
+<p>R-001 · <span class="blast-low">low</span>. Revert the touched Twitter Daily files and this note row.</p>
+
+<h2>Definition of done</h2>
+<ul>
+  <li><code>cd twitter-daily &amp;&amp; npm test</code> passes.</li>
+  <li>Web app can start own, timeline, and context workflows.</li>
+  <li>Prompt forbids invented timeline/context data and writes evidence-backed output.</li>
+</ul>
+</body>
+</html>

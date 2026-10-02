@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Twitter Daily suggestions run</title>
+<meta name="task" content="Run the 2026-07-13 suggestions scrape and draft generation">
+<meta name="date-started" content="2026-07-13">
+<meta name="date-updated" content="2026-07-13">
+<meta name="status" content="shipped">
+<meta name="blast-radius" content="low">
+<meta name="tags" content="twitter-daily,suggestions,x-scrape,drafts,data">
+<meta name="related" content="2026-07-13-twitter-daily-guidance-suggestions.html">
+<style>
+  body { font: 14px/1.45 -apple-system, system-ui, sans-serif; max-width: 880px; margin: 1.5rem auto; padding: 0 1rem; color: #111; }
+  h1 { font-size: 20px; margin: 0 0 .25rem; }
+  h2 { font-size: 15px; margin: 1.4rem 0 .4rem; border-bottom: 1px solid #ddd; padding-bottom: .2rem; }
+  table { border-collapse: collapse; width: 100%; margin: .4rem 0 .8rem; }
+  th, td { border: 1px solid #ddd; padding: 4px 8px; text-align: left; vertical-align: top; }
+  th { background: #f6f6f6; font-weight: 600; }
+  code { background: #f1f1f1; padding: 1px 4px; border-radius: 3px; font-size: 12.5px; }
+  code, pre { font-family: ui-monospace, Menlo, monospace; }
+  ul, ol { margin: .3rem 0 .8rem 1.2rem; padding: 0; }
+  li { margin: .15rem 0; }
+  .blast-low { color: #2a7a2a; }
+  .meta { color: #555; font-size: 12.5px; margin-bottom: .8rem; }
+  .kv { display: grid; grid-template-columns: 140px 1fr; gap: 2px 14px; font-size: 13px; margin: .4rem 0 1rem; }
+  .kv b { color: #444; font-weight: 600; }
+</style>
+</head>
+<body>
+<h1>Twitter Daily suggestions run</h1>
+<p class="meta"><code>main</code> · worktree <code>/Users/anishthite/workspace/poaster</code> · 2026-07-13 · status <b>shipped</b> · blast <span class="blast-low">low</span></p>
+
+<h2>Summary</h2>
+<div class="kv">
+  <b>Goal</b><div>Write home-timeline raw data, suggestions, digest, and state for <code>2026-07-13</code>.</div>
+  <b>Source</b><div>Signed-in Chrome on <code>x.com/home</code>, tweet guidance, reply guidance, and review JSON if present.</div>
+  <b>Surface</b><div><code>twitter-daily/data/{raw,digests,suggestions,state}.json</code>.</div>
+  <b>Schema</b><div>Use existing raw/digest/suggestions/state JSON shapes; latest invocation wrote <code>3</code> raw items and <code>5</code> suggestions.</div>
+  <b>Mobile</b><div>Untouched.</div>
+  <b>Open Qs</b><div>0.</div>
+</div>
+
+<h2>Algorithm</h2>
+<ol>
+  <li>Read visible home timeline <code>article</code> nodes with synchronous <code>chrome_evaluate</code>.</li>
+  <li>Scroll with <code>document.scrollingElement.scrollTo</code> or <code>window.scrollBy</code> inside <code>chrome_evaluate</code>.</li>
+  <li>Deduplicate by <code>url</code>, cap at <code>40</code>, and keep visible metrics only.</li>
+  <li>Generate <code>3-7</code> reply/post drafts grounded in scraped URLs and guidance.</li>
+</ol>
+
+<h2>Files</h2>
+<table>
+  <tr><th>Path</th><th>Kind</th><th>Delta</th></tr>
+  <tr><td><code>twitter-daily/data/raw/2026-07-13-suggestions.json</code></td><td>touch</td><td>Store scraped home timeline posts.</td></tr>
+  <tr><td><code>twitter-daily/data/digests/2026-07-13-suggestions.json</code></td><td>touch</td><td>Store timeline lessons for the suggestions run.</td></tr>
+  <tr><td><code>twitter-daily/data/suggestions/2026-07-13-suggestions.json</code></td><td>touch</td><td>Store grounded suggested drafts.</td></tr>
+  <tr><td><code>twitter-daily/data/state.json</code></td><td>touch</td><td>Record latest successful suggestions run.</td></tr>
+  <tr><td><code>implementation-notes/INDEX.html</code></td><td>touch</td><td>Add this note row.</td></tr>
+</table>
+
+<h2>Decisions</h2>
+<table>
+  <tr><th>ID</th><th>Choice · Rationale</th></tr>
+  <tr><td>D-001</td><td>Prefer reply drafts when a visible post gives a precise opening. This matches the workflow contract.</td></tr>
+  <tr><td>D-002</td><td>Do not open composer or post. The workflow only writes local JSON.</td></tr>
+</table>
+
+<h2>Deviations</h2>
+<table>
+  <tr><th>ID</th><th>From spec · Did · Reason</th></tr>
+  <tr><td>X-001</td><td>Spec allows up to <code>40</code> items; wrote <code>9</code> items because background scrolling exposed no more visible home posts after valid captures.</td></tr>
+  <tr><td>X-002</td><td>Second invocation wrote <code>3</code> useful raw items and <code>5</code> suggestions; background scrolling exposed only five visible posts and two were too thin for grounded drafts.</td></tr>
+</table>
+
+<h2>Assumptions</h2>
+<ul>
+  <li>A-001 · Chrome remains authorized and signed in. If wrong: stop without writing invented data.</li>
+</ul>
+
+<h2>Reversibility</h2>
+<p>R-001 · <span class="blast-low">low</span>. Delete the generated <code>2026-07-13-suggestions</code> JSON files and revert <code>state.json</code>.</p>
+
+<h2>Definition of done</h2>
+<ul>
+  <li>Raw JSON matches the required schema and contains only scraped visible data.</li>
+  <li>Suggestions JSON contains <code>3-7</code> drafts with evidence URLs.</li>
+  <li>Digest JSON includes source count, learnings, topics, follow-ups, and caveats.</li>
+  <li><code>state.json</code> names all written outputs.</li>
+</ul>
+</body>
+</html>

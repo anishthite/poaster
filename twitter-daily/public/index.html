@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Twitter Daily</title>
+<style>
+  body { margin: 0; font: 16px/1.5 system-ui, -apple-system, sans-serif; color: #0f172a; background: #f8fafc; }
+  main { max-width: 880px; margin: 0 auto; padding: 32px 18px 56px; }
+  section { background: white; border: 1px solid #e2e8f0; border-radius: 18px; padding: 20px; margin: 16px 0; box-shadow: 0 8px 24px rgb(15 23 42 / 5%); }
+  .hero { background: #0f172a; color: white; }
+  .eyebrow, small { color: #64748b; }
+  .hero .eyebrow { color: #cbd5e1; text-transform: uppercase; letter-spacing: .08em; font-size: 12px; }
+  h1, h2, p { margin-top: 0; }
+  li { margin: 10px 0; }
+  li p { margin: 4px 0; }
+  span { display: inline-block; margin: 0 8px 8px 0; padding: 4px 10px; border-radius: 999px; background: #e0f2fe; color: #075985; }
+  a { color: #2563eb; }
+  nav ul { padding-left: 20px; }
+  .controls button { appearance: none; border: 0; border-radius: 999px; padding: 10px 14px; margin: 0 8px 8px 0; background: #0f172a; color: white; font: inherit; cursor: pointer; }
+  .controls button.secondary { background: #e2e8f0; color: #0f172a; }
+  .workflow-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; margin: 12px 0; }
+  .workflow-grid div { border: 1px solid #e2e8f0; border-radius: 14px; padding: 12px; }
+  .workflow-grid p { margin: 6px 0 0; font-size: 13px; color: #475569; }
+  .controls pre, .run-log { white-space: pre-wrap; background: #f1f5f9; padding: 12px; border-radius: 12px; overflow-x: auto; }
+  .run-log { max-height: 420px; overflow-y: auto; font-size: 13px; }
+  .review-list { display: grid; gap: 14px; }
+  .review-card { border: 1px solid #e2e8f0; border-radius: 14px; padding: 14px; background: #f8fafc; }
+  .tweet-source { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px; margin-bottom: 10px; }
+  .draft-review pre { white-space: pre-wrap; margin: 6px 0; font: inherit; background: white; border-radius: 12px; padding: 12px; }
+  .review-card textarea { box-sizing: border-box; width: 100%; margin-top: 6px; border: 1px solid #cbd5e1; border-radius: 10px; padding: 10px; font: inherit; }
+  .review-actions button { appearance: none; border: 0; border-radius: 999px; padding: 8px 12px; margin: 8px 8px 0 0; background: #16a34a; color: white; font: inherit; cursor: pointer; }
+  .review-actions button.secondary { background: #dc2626; color: white; }
+  .review-status { color: #64748b; font-size: 13px; margin: 8px 0 0; }
+  .review-status[data-decision="approve"] { color: #15803d; }
+  .review-status[data-decision="deny"] { color: #b91c1c; }
+  .empty { color: #64748b; }
+</style>
+</head>
+<body>
+<main>
+<section class="controls">
+  <h2>Run controls</h2>
+  <p>Use <code>npm run serve</code>, then authorize and run through the embedded Pi SDK session.</p>
+  <button id="authButton">Authorize Chrome</button>
+  <button id="connectorButton" class="secondary">Open connector reload</button>
+  <button id="statusButton" class="secondary">Refresh status</button>
+  <h3>Timeline scrape</h3>
+  <div class="workflow-grid">
+    <div><button data-workflow="timeline">Scrape timeline + replies</button><p>Collect home timeline tweets, then store the first 3 visible replies for each tweet.</p></div>
+  </div>
+  <pre id="controlStatus">Checking local server…</pre>
+</section>
+<section>
+  <h2>SDK runner log</h2>
+  <p>This mirrors <code>.runs/web-run-latest.log</code>. Watch SDK output/errors here.</p>
+  <pre id="runLog" class="run-log">No run log yet.</pre>
+</section>
+
+    <section class="hero">
+      <p class="eyebrow">Latest digest</p>
+      <h1>2026-07-15</h1>
+      <p>Timeline + replies · 14 tweets · 0 replies</p>
+    </section>
+    <section>
+      <h2>Learnings</h2>
+      <ol><li><strong>Pure support replies are low-signal unless they add a hook</strong><p>The interview thread drew many visible replies, but most were short praise or hype with 0-2 likes and little conversation lift; a better reply would name a concrete takeaway from “dashboards are dead” or ask for the agent-design mechanism.</p><small><a href="https://x.com/palak_agarwal6/status/2077513386783600880">evidence</a> · <a href="https://x.com/booksbydivya/status/2077491201994019035">evidence</a> · <a href="https://x.com/tobinwtang/status/2077511987009855767">evidence</a> · <a href="https://x.com/MachJustine/status/2077483336113811590">evidence</a></small></li>
+<li><strong>Ask for the mechanism behind big software-culture claims</strong><p>The “screenshots over downloads” thread had a strong thesis but only short reaction replies; the opening for a useful reply is to ask what observable proof separates fanbase-building from ordinary app distribution.</p><small><a href="https://x.com/downloadlos/status/2077461230420197654">evidence</a> · <a href="https://x.com/humangallardo/status/2077462783331889604">evidence</a> · <a href="https://x.com/slowchaz/status/2077468916155052057">evidence</a></small></li>
+<li><strong>For product releases, the next useful reply names the adoption blocker</strong><p>The Flashtype release gave concrete features and a follow-up download link; a good reply should ask about the workflow boundary, cloud sync, or which file formats matter, not simply congratulate.</p><small><a href="https://x.com/samuelstroschei/status/2077488335858339990">evidence</a> · <a href="https://x.com/samuelstroschei/status/2077488348386771151">evidence</a></small></li>
+<li><strong>Author follow-ups can be brutally direct CTAs</strong><p>The short “Download for free at” follow-up is plain but functional: after the feature list, it supplies the next action without reopening the whole pitch.</p><small><a href="https://x.com/samuelstroschei/status/2077488348386771151">evidence</a></small></li></ol>
+    </section>
+    <section>
+      <h2>Topics</h2>
+      <p><span>agent experience</span> <span>dashboards</span> <span>software as creative output</span> <span>screenshots over downloads</span> <span>product launches</span> <span>markdown editor</span> <span>reply specificity</span></p>
+    </section>
+    <section>
+      <h2>Follow-ups</h2>
+      <ul><li>Reply to podcast/interview posts by naming one concrete thesis and asking for its practical design consequence.</li>
+<li>When a post makes a big cultural claim, ask for the proof signal or boundary condition.</li>
+<li>For launch posts, ask about the adoption blocker or the feature that changes the workflow.</li>
+<li>If replying with support, attach a specific line, mechanism, or next-step request.</li>
+<li>Use short author follow-ups as CTAs only after the original post already carries the detail.</li></ul>
+    </section>
+<nav>
+  <h2>History</h2>
+  <ul><li><a href="digests/2026-07-15-reply-learnings.json">2026-07-15</a> · Timeline + replies · 14 items</li>
+<li><a href="digests/2026-07-13-suggestions.json">2026-07-13</a> · Timeline + replies · 3 items</li>
+<li><a href="digests/2026-07-13-reply-learnings.json">2026-07-13</a> · Timeline + replies · 33 items</li>
+<li><a href="digests/2026-07-13-context.json">2026-07-13</a> · Timeline + replies · 28 items</li>
+<li><a href="digests/2026-07-13-timeline.json">2026-07-13</a> · Timeline + replies · 28 items</li>
+<li><a href="digests/2026-07-12.json">2026-07-12</a> · Timeline + replies · 3 items</li></ul>
+</nav>
+</main>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<script>
+window.TWITTER_DAILY_TOKEN = '__TWITTER_DAILY_TOKEN__';
+const statusEl = document.getElementById('controlStatus');
+const runLogEl = document.getElementById('runLog');
+const authButton = document.getElementById('authButton');
+const connectorButton = document.getElementById('connectorButton');
+const statusButton = document.getElementById('statusButton');
+const workflowButtons = Array.from(document.querySelectorAll('[data-workflow]'));
+const reviewCards = Array.from(document.querySelectorAll('[data-review-card]'));
+async function api(path, options) {
+  const res = await fetch(path, Object.assign({}, options, { headers: Object.assign({ 'x-twitter-daily-token': window.TWITTER_DAILY_TOKEN }, options && options.headers) }));
+  const data = await res.json().catch(() => ({ error: 'bad JSON response' }));
+  if (!res.ok) throw new Error(data.error || res.statusText);
+  return data;
+}
+async function refreshStatus() {
+  try {
+    const data = await api('/api/status');
+    const bridge = data.bridge || {};
+    const latest = (data.digests || [])[0];
+    statusEl.textContent = [
+      'bridge: ' + (bridge.connected ? 'connected' : 'not connected'),
+      'bridge mode: ' + (bridge.mode || 'unknown'),
+      'latest digest: ' + (latest ? latest.date + ' · ' + (latest.workflow || 'timeline') + ' · ' + latest.sourceCount + ' items' : 'none'),
+      'sdk: ' + (data.sdk && data.sdk.ready ? 'ready' : 'not started') + (data.sdk && data.sdk.authorized ? ' · authorized' : ''),
+      'run: ' + (data.running && !data.running.done ? 'running ' + (data.running.label || data.running.workflow || data.running.mode) : data.running && data.running.error ? 'error: ' + data.running.error : 'idle')
+    ].join('\n');
+  } catch (error) {
+    statusEl.textContent = 'Control server unavailable. Start it with: npm run serve\n' + error.message;
+  }
+}
+async function refreshLog() {
+  try {
+    const data = await api('/api/log');
+    runLogEl.textContent = data.log || 'No run log yet.';
+    runLogEl.scrollTop = runLogEl.scrollHeight;
+  } catch (error) {
+    runLogEl.textContent = 'Log unavailable. Start server with: npm run serve\n' + error.message;
+  }
+}
+authButton.addEventListener('click', async () => {
+  try {
+    const data = await api('/api/authorize', { method: 'POST' });
+    statusEl.textContent = data.message;
+  } catch (error) { statusEl.textContent = error.message; }
+});
+async function runWorkflow(workflow) {
+  try {
+    const data = await api('/api/run', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ workflow }) });
+    statusEl.textContent = data.message || 'Started SDK runner.';
+    setTimeout(refreshStatus, 1500);
+    setTimeout(refreshLog, 1500);
+  } catch (error) { statusEl.textContent = error.message; }
+}
+workflowButtons.forEach((button) => button.addEventListener('click', () => runWorkflow(button.dataset.workflow)));
+function applyReview(card, review) {
+  if (!review) return;
+  const note = card.querySelector('[data-review-note]');
+  const status = card.querySelector('[data-review-status]');
+  if (note && document.activeElement !== note) note.value = review.note || '';
+  status.dataset.decision = review.decision;
+  status.textContent = (review.decision === 'approve' ? 'Approved' : 'Denied') + (review.note ? ': ' + review.note : '');
+}
+async function loadReviewCards() {
+  for (const file of [...new Set(reviewCards.map((card) => card.dataset.suggestionFile))]) {
+    try {
+      const data = await api('/api/reviews?file=' + encodeURIComponent(file));
+      const byId = new Map((data.reviews || []).map((review) => [review.id, review]));
+      reviewCards.filter((card) => card.dataset.suggestionFile === file).forEach((card) => applyReview(card, byId.get(file + '#' + card.dataset.suggestionIndex)));
+    } catch (error) {
+      reviewCards.filter((card) => card.dataset.suggestionFile === file).forEach((card) => { card.querySelector('[data-review-status]').textContent = 'Review status unavailable: ' + error.message; });
+    }
+  }
+}
+async function saveReview(card, decision) {
+  const buttons = Array.from(card.querySelectorAll('[data-review-decision]'));
+  const status = card.querySelector('[data-review-status]');
+  buttons.forEach((button) => { button.disabled = true; });
+  status.textContent = 'Saving…';
+  try {
+    const data = await api('/api/reviews', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({
+      suggestionFile: card.dataset.suggestionFile,
+      suggestionIndex: Number(card.dataset.suggestionIndex),
+      decision,
+      note: card.querySelector('[data-review-note]').value,
+    }) });
+    applyReview(card, data.review);
+  } catch (error) {
+    status.textContent = 'Save failed: ' + error.message;
+  } finally {
+    buttons.forEach((button) => { button.disabled = false; });
+  }
+}
+reviewCards.forEach((card) => card.addEventListener('click', (event) => {
+  const button = event.target.closest?.('[data-review-decision]');
+  if (button) saveReview(card, button.dataset.reviewDecision);
+}));
+connectorButton.addEventListener('click', async () => {
+  try {
+    const data = await api('/api/open-connector', { method: 'POST' });
+    statusEl.textContent = data.message;
+  } catch (error) { statusEl.textContent = error.message; }
+});
+statusButton.addEventListener('click', () => { refreshStatus(); refreshLog(); });
+refreshStatus();
+refreshLog();
+loadReviewCards();
+setInterval(refreshStatus, 5000);
+setInterval(refreshLog, 1500);
+</script>
+</body>
+</html>
