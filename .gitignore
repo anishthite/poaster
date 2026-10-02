@@ -1,3 +1,7 @@
 .DS_Store
 .playwright-cli/
 output/
+
+# private research/scraped data
+banger-lab/
+setup.sh
